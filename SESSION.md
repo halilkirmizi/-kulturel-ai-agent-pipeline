@@ -1,7 +1,7 @@
 # Pipeline Session Log
 
 > Read this file first at the start of each session.
-> Links: [[kulturel AI agent]] · [[Key Decisions]] · [[WORKFLOW]]
+> Links: [[kulturel AI agent]] · [[Key Decisions]] · [[CLAUDE.md]] · [[CHANGELOG.md]]
 
 ---
 
@@ -16,67 +16,82 @@
 | 6 | 2026-06-16 | GPU migration + compiler pivot | ✅ |
 | 7 | 2026-06-17 | Minimal pipeline (whisper->LLM->FFmpeg) | ✅ |
 | 8 | 2026-06-18 | Project revival — skeleton setup | ✅ |
-| **9** | **2026-06-18** | **Architecture refactor — modular production** | **🔄** |
+| 9 | 2026-06-18 | Architecture refactor — modular production | ✅ |
+| **10** | **2026-06-21** | **Git remote + dosya temizliği + session.md işlevi** | **🔄** |
 
 ---
 
-## Session 9 — 2026-06-18: Architectural Refactor
+## Session 10 — 2026-06-21: Git remote + File Cleanup + Session.md Contract
 
 ### What Was Done
 
-**Complete architecture migration**: monolithic `shorts_pipeline.py` (733 lines)
-→ modular production architecture (13 files, ~1500 lines total).
+**Artifact Ownership Registry** (`core/artifact_registry.py`): 17 artifact types, single-writer enforcement, validate(), print_report(), save()/load() via `.artifact_registry.json`, freeze()
 
-**New modules created:**
+**External Artifact Auditor** (`core/artifact_auditor.py`): 3 modes (bootstrap/drift/verify), ghost/missing/duplicate_writer/shadow detection, severity classification
 
-| Module | File | Purpose |
-|--------|------|---------|
-| Core config | `core/config.py` | Immutable PipelineConfig with dataclasses |
-| Core logger | `core/logger.py` | Structured logging (console + file) |
-| Ingest | `ingest/downloader.py` | yt-dlp wrapper with error handling |
-| Transcription | `analysis/transcription.py` | GPU-first whisper with CPU fallback |
-| Topic detection | `analysis/topic_detection.py` | Keyword + entity extraction |
-| Clip scoring | `analysis/clip_scoring.py` | 4-dimension LLM scoring engine |
-| Captions | `editing/captions.py` | Word-level drawtext (PTS-safe) |
-| Renderer | `editing/renderer.py` | Crop + compose + audio mix |
-| Effects | `editing/effects.py` | Placeholder for analytical-style effects |
-| Format loader | `formats/format_loader.py` | JSON config loader |
-| YouTube upload | `upload/youtube.py` | OAuth v3 with retry + token caching |
-| Orchestrator | `main.py` | Stateless CLI entry point |
+**Memory Write-Back System** (`core/memory_writer.py`): MemoryCandidate (+semantic_class), MemoryStore (bounded 50/cat, 30d compaction, behavior_hints()), CompressionLayer (class-aware dedup), SemanticSignalFilter, LearningLoopGate, MemoryWriter
 
-**Deleted:**
-- `shorts_pipeline.py` (monolith, replaced by main.py)
-- `formats/format2.json` (brainrot format — not needed)
-- `upload/uploader.py` (stub, replaced by youtube.py)
+**Semantic Memory Filter Layer**: `SemanticSignalFilter.classify_signal()` returns PROMOTE/REJECT/DOWNGRADE; non-semantic path patterns blocked; structural/invariant signals PROMOTE
 
-**Key improvements:**
+**Memory Feedback Loop** (`core/memory_influence.py`): MemoryInfluenceEngine, RuntimeConfigPatch, threshold/scoring/routing hints, enforce_guards()
 
-1. **PTS-STARTPTS reset** on every FFmpeg crop/caption/compose call
-2. **-vsync 0** on all encodes (preserves VFR)
-3. **No global mutable state** — PipelineConfig is frozen dataclass
-4. **GPU-first with CPU fallback** in all CUDA paths
-5. **NVENC encode path** when gpu_enabled=True
-6. **4-dimension clip scoring** (curiosity, emotion, education, narrative)
-7. **Topic detection** to bias LLM scoring toward content-rich segments
-8. **YouTube OAuth v3** with token caching and exponential backoff retry
-9. **Structured logging** instead of print statements
+**ControlArbiter** (`core/control_arbiter.py`): 5-layer priority resolution, UnifiedRuntimeConfig, ResolvedValue (provenance), print_trace()
 
-### Current State
+**StepTracker** (`core/steptracker.py`): heuristic_adjustments(), apply_influence() dict support, get_adjusted_threshold()
 
-- All 13 modules written and production-ready
-- Dependencies updated in requirements.txt (added google-api-python-client et al.)
-- format1.json cleaned (no effects section, speed=1.0, no brainrot references)
-- All PTS bugs fixed at the source
-- Phase 2 simplified: no outro.mp3 requirement, single intro audio
+**Fixes:**
+- StepTracker UUID isolation: `execution_trace.json` → `execution_trace_<uuid>.json` (per-run, no shared lock)
+- Downloader identity fix: removed glob+mtime file selection; uses `info["id"]` from yt-dlp for deterministic output path
+- Hook config bug fix: HookConfig was reading from `cap_raw` (captions) instead of `hook_overlay`
+- Subscribe overlay config extended: added `fontcolor`, `bordercolor`, `borderw` fields
+
+**Format:**
+- Created `format_football_interview.json` (hook 120px/5sn, subscribe red/120px/black outline, intro_duck_volume=0.0, noise_reduction disabled)
+- format1.json audio EQ cleaned (200Hz/-2dB + 3000Hz/+3dB)
+
+**Pipeline verified end-to-end**: Real video download → transcribe (222 segments, 96.7% es) → score (3 clips) → crop → Phase 2 compose → final.mp4 (no captions) → first YouTube upload (Arjantin WC interview, "Eternal Number 10")
+
+**Cross-run contamination test**: 3 consecutive runs with same failure → NONE detected (gate, memory, AOR all clean)
+
+**Adaptive mode test**: Ran `--mode adaptive_mode --trace-arbiter` — arbitration chain works but memory_store empty → all values default/zero
+
+**Cleanup**: temp/ (125 files, 1.68 GB → 0), old run dirs (16 → 1 kept), execution_trace files (10 → 0), logs (107 → 0), memory_store reset to empty
+
+**Git & Repo Setup:**
+- Created `.gitignore` (temp/, logs/, downloads/, shorts_output/, memory_store.json, .env, client_secret.json, *.pickle, .Rhistory)
+- Created `CHANGELOG.md` (Dory format — append-only, one line per decision)
+- Created `CLAUDE.md` (30-line rule file — architecture, priority, rules, sensitive files)
+- Initialized separate git repo in pipeline/ directory (NOT vault root)
+- Added remote: `halilkirmizi/-kulturel-ai-agent-pipeline.git`
+- Initial commit: 48 files, 8523 lines
+- Pushed to `main` branch
+
+### Key Decisions
+
+1. **SESSION.md = conversation history backup.** Three-file system: CHANGELOG.md (what changed), SESSION.md (decisions + context), CLAUDE.md (rules). SESSION.md updated at end of each session, read at start of next.
+2. Memory promotion requires ≥1 artifact reference (except source=artifact_registry)
+3. Compression keys on `signature|semantic_class` — lifecycle_noise NEVER merges into semantic
+4. Semantic filter uses path patterns not AOR lifecycle — `temp/` prefix → lifecycle_noise
+5. AOR persistence uses atomic `.tmp.json` + rename
+6. ControlArbiter priority: DAG/Contract (1) > AOR (2) > MemoryInfluence (3) > StepTracker (4) > ClipScoring (5)
+7. Priority order for runtime config: DAG/Contract (1) > AOR (2) > MemoryInfluence (3) > StepTracker (4) > ClipScoring (5)
+8. All runtime config must pass through ControlArbiter — no direct patch application
+9. `--mode observation_only` (default): no memory influence; `adaptive_mode`: memory influences execution
+10. Downloader path resolved via `info["id"]` from yt-dlp — no glob, no mtime
+11. Hook config fields read from `hook_overlay` JSON section, not `captions`
+12. Subscribe overlay uses config-driven fontcolor/bordercolor/borderw
+13. `--no-captions` is CLI-only flag, does not persist in any config
+14. User records own intro audio separately (no unsolicited microphone recording)
+15. `obsidian_bridge/` kept — user wants to use it later
 
 ### Next Steps
 
-1. **Install dependencies**: `pip install -r requirements.txt`
-2. **Set up YouTube OAuth**: download `client_secret.json` from Google Cloud Console → save to `upload/`
-3. **Set GROQ_API_KEY** in `.env`
-4. **Test Phase 1** on a YouTube video
-5. **Test Phase 2** with an intro audio clip
+1. Run new video through full pipeline to generate real memory_store entries
+2. Exercise adaptive mode with populated memory_store
+3. Use obsidian_bridge when user asks for it
 
-### Known Bugs
+### Known Bugs / Issues
 
-- None currently known. Old PTS bug, GPU lack, and upload stub are all resolved.
+- LSP errors in downloader.py (yt-dlp type stub mismatch) and clip_scoring.py (Optional str → str) are pre-existing
+- Windows `tempfile.mkstemp` PermissionError known quirk — real pipeline paths (shorts_output/) unaffected
+- ASS captions still use Arial font (hardcoded)

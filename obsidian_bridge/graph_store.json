@@ -1,0 +1,1713 @@
+{
+  "meta": {
+    "vault": "SecondBrain",
+    "count_nodes": 70,
+    "count_edges": 172,
+    "count_tags": 31
+  },
+  "nodes": [
+    {
+      "id": "00_Inbox/_about_inbox.md",
+      "label": "_about_inbox",
+      "folder": "00_Inbox",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_about_projects.md",
+      "label": "_about_projects",
+      "folder": "01_Projects",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/_CLAUDE.md",
+      "label": "_CLAUDE",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/ALWAYS.md",
+      "label": "ALWAYS",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/ARCHIVE/INDEX.md",
+      "label": "INDEX",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/ARCHIVE",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/PROJECT.md",
+      "label": "PROJECT",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/preferences.md",
+      "label": "preferences",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION.md",
+      "label": "SESSION",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION_SUMMARY.md",
+      "label": "SESSION_SUMMARY",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "label": "WORKFLOW",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/Key Decisions.md",
+      "label": "Key Decisions",
+      "folder": "01_Projects/kulturel AI agent",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/kulturel AI agent.md",
+      "label": "kulturel AI agent",
+      "folder": "01_Projects/kulturel AI agent",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/_CLAUDE.md",
+      "label": "_CLAUDE",
+      "folder": "01_Projects/kulturel AI agent/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/MEMORY/ALWAYS.md",
+      "label": "ALWAYS",
+      "folder": "01_Projects/kulturel AI agent/pipeline/MEMORY",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/MEMORY/ARCHIVE/INDEX.md",
+      "label": "INDEX",
+      "folder": "01_Projects/kulturel AI agent/pipeline/MEMORY/ARCHIVE",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/MEMORY/PROJECT.md",
+      "label": "PROJECT",
+      "folder": "01_Projects/kulturel AI agent/pipeline/MEMORY",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/preferences.md",
+      "label": "preferences",
+      "folder": "01_Projects/kulturel AI agent/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/REFACTOR_SEQUENCE.md",
+      "label": "REFACTOR_SEQUENCE",
+      "folder": "01_Projects/kulturel AI agent/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/SESSION.md",
+      "label": "SESSION",
+      "folder": "01_Projects/kulturel AI agent/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/STATE_CONTRACT.md",
+      "label": "STATE_CONTRACT",
+      "folder": "01_Projects/kulturel AI agent/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/WORKFLOW.md",
+      "label": "WORKFLOW",
+      "folder": "01_Projects/kulturel AI agent/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/Model Engine Architect.md",
+      "label": "Model Engine Architect",
+      "folder": "01_Projects",
+      "tags": []
+    },
+    {
+      "id": "02_Areas/_about_areas.md",
+      "label": "_about_areas",
+      "folder": "02_Areas",
+      "tags": []
+    },
+    {
+      "id": "02_Projects/Game Project/_CLAUDE.md",
+      "label": "_CLAUDE",
+      "folder": "02_Projects/Game Project",
+      "tags": []
+    },
+    {
+      "id": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "label": "Açık Sorular & Backlog",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "backlog",
+        "gamedev",
+        "oyun"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Changelog.md",
+      "label": "Changelog",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "changelog",
+        "gamedev",
+        "oyun"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Chapter & Dünya.md",
+      "label": "Chapter & Dünya",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "dunya",
+        "gamedev",
+        "oyun",
+        "tasarim"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "label": "Dövüş & Sistemler",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "dovus",
+        "gamedev",
+        "oyun",
+        "tasarim"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Game Project.md",
+      "label": "Game Project",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "gamedev",
+        "oyun",
+        "project",
+        "souls-like",
+        "tasarim",
+        "wuthering-heights"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Gotchas.md",
+      "label": "Gotchas",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "bug",
+        "gamedev",
+        "oyun",
+        "teknik"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Karakterler & Tether.md",
+      "label": "Karakterler & Tether",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "gamedev",
+        "karakter",
+        "oyun",
+        "tasarim"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Key Decisions.md",
+      "label": "Key Decisions",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "gamedev",
+        "kararlar",
+        "oyun"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "label": "Prologue Sahne Betiği",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "gamedev",
+        "oyun",
+        "prologue",
+        "sahne"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/README.md",
+      "label": "README",
+      "folder": "02_Projects/Game Project",
+      "tags": []
+    },
+    {
+      "id": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "label": "Tasarım Kanonu",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "gamedev",
+        "oyun",
+        "tasarim"
+      ]
+    },
+    {
+      "id": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "label": "Yapım & Pipeline",
+      "folder": "02_Projects/Game Project",
+      "tags": [
+        "gamedev",
+        "oyun",
+        "pipeline",
+        "yapim"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU - CS Concepts.md",
+      "label": "HSLU - CS Concepts",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "course",
+        "hslu",
+        "resource"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU - Design of Experiments.md",
+      "label": "HSLU - Design of Experiments",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "course",
+        "hslu",
+        "resource"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU - Linear Algebra.md",
+      "label": "HSLU - Linear Algebra",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "course",
+        "hslu",
+        "resource"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU - Python.md",
+      "label": "HSLU - Python",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "course",
+        "hslu",
+        "resource"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "label": "HSLU - R-Bootcamp",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "course",
+        "hslu",
+        "resource"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU - Resources.md",
+      "label": "HSLU - Resources",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "hslu",
+        "reference",
+        "resource"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU - Statistics.md",
+      "label": "HSLU - Statistics",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "course",
+        "hslu",
+        "resource"
+      ]
+    },
+    {
+      "id": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "label": "HSLU MSc - Pre-Semester Plan",
+      "folder": "03_Projects/Study",
+      "tags": [
+        "hslu",
+        "project",
+        "studyplan"
+      ]
+    },
+    {
+      "id": "03_Resources/_about_resources.md",
+      "label": "_about_resources",
+      "folder": "03_Resources",
+      "tags": []
+    },
+    {
+      "id": "04_Archive/_about_archive.md",
+      "label": "_about_archive",
+      "folder": "04_Archive",
+      "tags": []
+    },
+    {
+      "id": "05_Meta/Second Brain.md",
+      "label": "Second Brain",
+      "folder": "05_Meta",
+      "tags": [
+        "pkm",
+        "productivity",
+        "resource"
+      ]
+    },
+    {
+      "id": "05_Meta/Templates/Area.md",
+      "label": "Area",
+      "folder": "05_Meta/Templates",
+      "tags": [
+        "area"
+      ]
+    },
+    {
+      "id": "05_Meta/Templates/Boss Card.md",
+      "label": "Boss Card",
+      "folder": "05_Meta/Templates",
+      "tags": [
+        "boss",
+        "gamedev",
+        "tasarim"
+      ]
+    },
+    {
+      "id": "05_Meta/Templates/Daily Note.md",
+      "label": "Daily Note",
+      "folder": "05_Meta/Templates",
+      "tags": []
+    },
+    {
+      "id": "05_Meta/Templates/Encounter.md",
+      "label": "Encounter",
+      "folder": "05_Meta/Templates",
+      "tags": [
+        "combat",
+        "encounter",
+        "gamedev"
+      ]
+    },
+    {
+      "id": "05_Meta/Templates/Resource.md",
+      "label": "Resource",
+      "folder": "05_Meta/Templates",
+      "tags": [
+        "resource"
+      ]
+    },
+    {
+      "id": "05_Meta/Templates/Talisman.md",
+      "label": "Talisman",
+      "folder": "05_Meta/Templates",
+      "tags": [
+        "gamedev",
+        "item",
+        "talisman"
+      ]
+    },
+    {
+      "id": "START_HERE.md",
+      "label": "START_HERE",
+      "folder": "",
+      "tags": []
+    },
+    {
+      "id": "00_Inbox",
+      "label": "00_Inbox",
+      "folder": "",
+      "tags": []
+    },
+    {
+      "id": "01_Projects",
+      "label": "01_Projects",
+      "folder": "",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "label": "pipeline",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY",
+      "label": "MEMORY",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/ARCHIVE",
+      "label": "ARCHIVE",
+      "folder": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent",
+      "label": "kulturel AI agent",
+      "folder": "01_Projects",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline",
+      "label": "pipeline",
+      "folder": "01_Projects/kulturel AI agent",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/MEMORY",
+      "label": "MEMORY",
+      "folder": "01_Projects/kulturel AI agent/pipeline",
+      "tags": []
+    },
+    {
+      "id": "01_Projects/kulturel AI agent/pipeline/MEMORY/ARCHIVE",
+      "label": "ARCHIVE",
+      "folder": "01_Projects/kulturel AI agent/pipeline/MEMORY",
+      "tags": []
+    },
+    {
+      "id": "02_Areas",
+      "label": "02_Areas",
+      "folder": "",
+      "tags": []
+    },
+    {
+      "id": "02_Projects/Game Project",
+      "label": "Game Project",
+      "folder": "02_Projects",
+      "tags": []
+    },
+    {
+      "id": "03_Projects/Study",
+      "label": "Study",
+      "folder": "03_Projects",
+      "tags": []
+    },
+    {
+      "id": "03_Resources",
+      "label": "03_Resources",
+      "folder": "",
+      "tags": []
+    },
+    {
+      "id": "04_Archive",
+      "label": "04_Archive",
+      "folder": "",
+      "tags": []
+    },
+    {
+      "id": "05_Meta",
+      "label": "05_Meta",
+      "folder": "",
+      "tags": []
+    },
+    {
+      "id": "05_Meta/Templates",
+      "label": "Templates",
+      "folder": "05_Meta",
+      "tags": []
+    }
+  ],
+  "edges": [
+    {
+      "source": "00_Inbox/_about_inbox.md",
+      "target": "00_Inbox",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_about_projects.md",
+      "target": "01_Projects",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/_CLAUDE.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/ALWAYS.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/ARCHIVE/INDEX.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/ARCHIVE",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY/PROJECT.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/MEMORY",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/preferences.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION.md",
+      "target": "../Key Decisions",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION.md",
+      "target": "../kulturel AI agent",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION_SUMMARY.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "target": "../Key Decisions",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/_CLAUDE.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "target": "../kulturel AI agent",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/Key Decisions.md",
+      "target": "01_Projects/kulturel AI agent",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/kulturel AI agent.md",
+      "target": "./Key Decisions",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/kulturel AI agent.md",
+      "target": "./pipeline/WORKFLOW",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/kulturel AI agent.md",
+      "target": "./pipeline/SESSION",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/kulturel AI agent.md",
+      "target": "01_Projects/kulturel AI agent",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/_CLAUDE.md",
+      "target": "01_Projects/kulturel AI agent/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/MEMORY/ALWAYS.md",
+      "target": "01_Projects/kulturel AI agent/pipeline/MEMORY",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/MEMORY/ARCHIVE/INDEX.md",
+      "target": "01_Projects/kulturel AI agent/pipeline/MEMORY/ARCHIVE",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/MEMORY/PROJECT.md",
+      "target": "01_Projects/kulturel AI agent/pipeline/MEMORY",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/preferences.md",
+      "target": "01_Projects/kulturel AI agent/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/REFACTOR_SEQUENCE.md",
+      "target": "01_Projects/kulturel AI agent/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/SESSION.md",
+      "target": "01_Projects/kulturel AI agent/Key Decisions.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/SESSION.md",
+      "target": "01_Projects/kulturel AI agent/kulturel AI agent.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/SESSION.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/WORKFLOW.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/SESSION.md",
+      "target": "01_Projects/kulturel AI agent/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/STATE_CONTRACT.md",
+      "target": "01_Projects/kulturel AI agent/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/WORKFLOW.md",
+      "target": "01_Projects/kulturel AI agent/Key Decisions.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/WORKFLOW.md",
+      "target": "01_Projects/_archive/kulturel_ai_agent_rules/pipeline/SESSION.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/WORKFLOW.md",
+      "target": "01_Projects/kulturel AI agent/kulturel AI agent.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/kulturel AI agent/pipeline/WORKFLOW.md",
+      "target": "01_Projects/kulturel AI agent/pipeline",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "01_Projects/Model Engine Architect.md",
+      "target": "01_Projects",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Areas/_about_areas.md",
+      "target": "02_Areas",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/_CLAUDE.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "target": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "target": "02_Projects/Game Project/Chapter & Dünya.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Chapter & Dünya.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Changelog.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Chapter & Dünya.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Chapter & Dünya.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Chapter & Dünya.md",
+      "target": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Chapter & Dünya.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Chapter & Dünya.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "target": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "target": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "01_Projects/kulturel AI agent/Key Decisions.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "wuthering-heights-summary",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Gotchas.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/README.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Chapter & Dünya.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Changelog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Game Project.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Gotchas.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Gotchas.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Gotchas.md",
+      "target": "02_Projects/Game Project/Changelog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Gotchas.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Gotchas.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Karakterler & Tether.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Karakterler & Tether.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Karakterler & Tether.md",
+      "target": "02_Projects/Game Project/Chapter & Dünya.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Karakterler & Tether.md",
+      "target": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Karakterler & Tether.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project/Changelog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Key Decisions.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "target": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "target": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "target": "02_Projects/Game Project/Changelog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/README.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "target": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "target": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "target": "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "target": "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "target": "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "target": "02_Projects/Game Project/Game Project.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "target": "02_Projects/Game Project/Changelog.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "target": "02_Projects/Game Project/Tasarım Kanonu.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "02_Projects/Game Project/Yapım & Pipeline.md",
+      "target": "02_Projects/Game Project",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - CS Concepts.md",
+      "target": "03_Projects/Study/HSLU - Resources.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - CS Concepts.md",
+      "target": "NoteGPT_MindMap_Instructions & Programs Crash Course Computer Science 8",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "03_Projects/Study/HSLU - CS Concepts.md",
+      "target": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - CS Concepts.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Design of Experiments.md",
+      "target": "03_Projects/Study/HSLU - Resources.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Design of Experiments.md",
+      "target": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Design of Experiments.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Linear Algebra.md",
+      "target": "03_Projects/Study/HSLU - Resources.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Linear Algebra.md",
+      "target": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Linear Algebra.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Python.md",
+      "target": "03_Projects/Study/HSLU - Resources.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Python.md",
+      "target": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Python.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "target": "03_Projects/Study/HSLU - Resources.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "target": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study/HSLU - Design of Experiments.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study/HSLU - Linear Algebra.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study/HSLU - Python.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study/HSLU - Statistics.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study/HSLU - CS Concepts.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Resources.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Statistics.md",
+      "target": "03_Projects/Study/HSLU - Resources.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Statistics.md",
+      "target": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU - Statistics.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study/HSLU - Design of Experiments.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "05_Meta/Second Brain.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study/HSLU - Linear Algebra.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "Project_learning",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study/HSLU - Python.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study/HSLU - Resources.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study/HSLU - Statistics.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study/HSLU - CS Concepts.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md",
+      "target": "03_Projects/Study",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "03_Resources/_about_resources.md",
+      "target": "03_Resources",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "04_Archive/_about_archive.md",
+      "target": "04_Archive",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Second Brain.md",
+      "target": "Obsidian",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "05_Meta/Second Brain.md",
+      "target": "Tiago Forte",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "05_Meta/Second Brain.md",
+      "target": "PARA Method",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "05_Meta/Second Brain.md",
+      "target": "05_Meta",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Templates/Area.md",
+      "target": "05_Meta/Templates",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Templates/Boss Card.md",
+      "target": "02_Projects/Game Project/Karakterler & Tether.md",
+      "type": "wikilink",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Templates/Boss Card.md",
+      "target": "05_Meta/Templates",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Templates/Daily Note.md",
+      "target": "05_Meta/Templates",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Templates/Encounter.md",
+      "target": "05_Meta/Templates",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Templates/Resource.md",
+      "target": "05_Meta/Templates",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "05_Meta/Templates/Talisman.md",
+      "target": "05_Meta/Templates",
+      "type": "container",
+      "resolved": true
+    },
+    {
+      "source": "START_HERE.md",
+      "target": "Marathon Training",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "START_HERE.md",
+      "target": "Italy Trip",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "START_HERE.md",
+      "target": "wikilinks",
+      "type": "wikilink",
+      "resolved": false
+    },
+    {
+      "source": "START_HERE.md",
+      "target": "Tiago Forte",
+      "type": "wikilink",
+      "resolved": false
+    }
+  ],
+  "tags": {
+    "gamedev": [
+      "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "02_Projects/Game Project/Changelog.md",
+      "02_Projects/Game Project/Chapter & Dünya.md",
+      "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "02_Projects/Game Project/Game Project.md",
+      "02_Projects/Game Project/Gotchas.md",
+      "02_Projects/Game Project/Karakterler & Tether.md",
+      "02_Projects/Game Project/Key Decisions.md",
+      "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "02_Projects/Game Project/Tasarım Kanonu.md",
+      "02_Projects/Game Project/Yapım & Pipeline.md",
+      "05_Meta/Templates/Boss Card.md",
+      "05_Meta/Templates/Encounter.md",
+      "05_Meta/Templates/Talisman.md"
+    ],
+    "backlog": [
+      "02_Projects/Game Project/Açık Sorular & Backlog.md"
+    ],
+    "oyun": [
+      "02_Projects/Game Project/Açık Sorular & Backlog.md",
+      "02_Projects/Game Project/Changelog.md",
+      "02_Projects/Game Project/Chapter & Dünya.md",
+      "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "02_Projects/Game Project/Game Project.md",
+      "02_Projects/Game Project/Gotchas.md",
+      "02_Projects/Game Project/Karakterler & Tether.md",
+      "02_Projects/Game Project/Key Decisions.md",
+      "02_Projects/Game Project/Prologue Sahne Betiği.md",
+      "02_Projects/Game Project/Tasarım Kanonu.md",
+      "02_Projects/Game Project/Yapım & Pipeline.md"
+    ],
+    "changelog": [
+      "02_Projects/Game Project/Changelog.md"
+    ],
+    "tasarim": [
+      "02_Projects/Game Project/Chapter & Dünya.md",
+      "02_Projects/Game Project/Dövüş & Sistemler.md",
+      "02_Projects/Game Project/Game Project.md",
+      "02_Projects/Game Project/Karakterler & Tether.md",
+      "02_Projects/Game Project/Tasarım Kanonu.md",
+      "05_Meta/Templates/Boss Card.md"
+    ],
+    "dunya": [
+      "02_Projects/Game Project/Chapter & Dünya.md"
+    ],
+    "dovus": [
+      "02_Projects/Game Project/Dövüş & Sistemler.md"
+    ],
+    "project": [
+      "02_Projects/Game Project/Game Project.md",
+      "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md"
+    ],
+    "souls-like": [
+      "02_Projects/Game Project/Game Project.md"
+    ],
+    "wuthering-heights": [
+      "02_Projects/Game Project/Game Project.md"
+    ],
+    "bug": [
+      "02_Projects/Game Project/Gotchas.md"
+    ],
+    "teknik": [
+      "02_Projects/Game Project/Gotchas.md"
+    ],
+    "karakter": [
+      "02_Projects/Game Project/Karakterler & Tether.md"
+    ],
+    "kararlar": [
+      "02_Projects/Game Project/Key Decisions.md"
+    ],
+    "prologue": [
+      "02_Projects/Game Project/Prologue Sahne Betiği.md"
+    ],
+    "sahne": [
+      "02_Projects/Game Project/Prologue Sahne Betiği.md"
+    ],
+    "yapim": [
+      "02_Projects/Game Project/Yapım & Pipeline.md"
+    ],
+    "pipeline": [
+      "02_Projects/Game Project/Yapım & Pipeline.md"
+    ],
+    "course": [
+      "03_Projects/Study/HSLU - CS Concepts.md",
+      "03_Projects/Study/HSLU - Design of Experiments.md",
+      "03_Projects/Study/HSLU - Linear Algebra.md",
+      "03_Projects/Study/HSLU - Python.md",
+      "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "03_Projects/Study/HSLU - Statistics.md"
+    ],
+    "hslu": [
+      "03_Projects/Study/HSLU - CS Concepts.md",
+      "03_Projects/Study/HSLU - Design of Experiments.md",
+      "03_Projects/Study/HSLU - Linear Algebra.md",
+      "03_Projects/Study/HSLU - Python.md",
+      "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "03_Projects/Study/HSLU - Resources.md",
+      "03_Projects/Study/HSLU - Statistics.md",
+      "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md"
+    ],
+    "resource": [
+      "03_Projects/Study/HSLU - CS Concepts.md",
+      "03_Projects/Study/HSLU - Design of Experiments.md",
+      "03_Projects/Study/HSLU - Linear Algebra.md",
+      "03_Projects/Study/HSLU - Python.md",
+      "03_Projects/Study/HSLU - R-Bootcamp.md",
+      "03_Projects/Study/HSLU - Resources.md",
+      "03_Projects/Study/HSLU - Statistics.md",
+      "05_Meta/Second Brain.md",
+      "05_Meta/Templates/Resource.md"
+    ],
+    "reference": [
+      "03_Projects/Study/HSLU - Resources.md"
+    ],
+    "studyplan": [
+      "03_Projects/Study/HSLU MSc - Pre-Semester Plan.md"
+    ],
+    "pkm": [
+      "05_Meta/Second Brain.md"
+    ],
+    "productivity": [
+      "05_Meta/Second Brain.md"
+    ],
+    "area": [
+      "05_Meta/Templates/Area.md"
+    ],
+    "boss": [
+      "05_Meta/Templates/Boss Card.md"
+    ],
+    "encounter": [
+      "05_Meta/Templates/Encounter.md"
+    ],
+    "combat": [
+      "05_Meta/Templates/Encounter.md"
+    ],
+    "talisman": [
+      "05_Meta/Templates/Talisman.md"
+    ],
+    "item": [
+      "05_Meta/Templates/Talisman.md"
+    ]
+  }
+}

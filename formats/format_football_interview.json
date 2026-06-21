@@ -1,0 +1,60 @@
+{
+  "name": "Football Interview",
+  "description": "Football post-match interview Shorts. Bold hook, generous duration for spoken content, clean audio.",
+  "audio": {
+    "highpass": 80,
+    "lowpass": 8000,
+    "noise_reduction": "",
+    "normalization": "",
+    "bitrate": "192k",
+    "eq": [
+      {"frequency": 200, "type": "q", "width": 200, "gain": -2},
+      {"frequency": 3000, "type": "q", "width": 500, "gain": 3}
+    ],
+    "ambient_volume": 0.90,
+    "intro_duck_volume": 0.0,
+    "crossfade_duration": 3.0
+  },
+  "captions": {
+    "fontsize": 38,
+    "uppercase": true,
+    "outline": 2,
+    "box_border": 4,
+    "margin_bottom": 160,
+    "box_color": "black@0.4",
+    "shadow_color": "black",
+    "font": "C:/Windows/Fonts/impact.ttf"
+  },
+  "hook_overlay": {
+    "fontsize": 120,
+    "uppercase": true,
+    "duration": 5.0,
+    "y": "h*0.15",
+    "font": "C:/Windows/Fonts/impact.ttf"
+  },
+  "subscribe_overlay": {
+    "fontsize": 120,
+    "text": "SUBSCRIBE!",
+    "duration": 1.0,
+    "font": "C:/Windows/Fonts/impact.ttf",
+    "fontcolor": "red",
+    "bordercolor": "black",
+    "borderw": 3
+  },
+  "compose": {
+    "codec": "libx264",
+    "preset": "fast",
+    "crf": 23,
+    "audio_codec": "aac",
+    "audio_bitrate": "128k"
+  },
+  "clip": {
+    "speed": 1.0,
+    "crop": "",
+    "scale": "1080:1920:force_original_aspect_ratio=decrease",
+    "pad": "1080:1920:(ow-iw)/2:(oh-ih)/2:black",
+    "resize_flags": "lanczos",
+    "preset": "slow",
+    "crf": 18
+  }
+}

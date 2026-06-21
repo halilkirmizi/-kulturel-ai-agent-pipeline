@@ -1,0 +1,262 @@
+"""Central configuration loader.
+
+Loads format JSON + environment variables into a single immutable config object.
+No global mutable state — each module receives its config explicitly.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List
+
+from dotenv import load_dotenv
+
+
+@dataclass(frozen=True)
+class CaptionConfig:
+    enabled: bool = True
+    fontsize: int = 38
+    uppercase: bool = True
+    outline: int = 2
+    box_border: int = 4
+    margin_bottom: int = 160
+    box_color: str = "black@0.4"
+    shadow_color: str = "black"
+    font: str = "C:/Windows/Fonts/impact.ttf"
+
+
+@dataclass(frozen=True)
+class AudioConfig:
+    highpass: int = 80
+    lowpass: int = 8000
+    noise_reduction: str = "anlmdn=s=6:p=0.05"
+    normalization: str = "dynaudnorm=f=150:g=15:p=0.95"
+    bitrate: str = "192k"
+    eq: List[Dict[str, Any]] = field(default_factory=list)
+    ambient_volume: float = 0.90
+    intro_duck_volume: float = 0.70
+    crossfade_duration: float = 3.0
+
+
+@dataclass(frozen=True)
+class HookConfig:
+    fontsize: int = 72
+    uppercase: bool = True
+    duration: float = 2.0
+    y: str = "h*0.15"
+    font: str = "C:/Windows/Fonts/impact.ttf"
+
+
+@dataclass(frozen=True)
+class SubscribeConfig:
+    fontsize: int = 48
+    text: str = "SUBSCRIBE"
+    duration: float = 1.0
+    font: str = "C:/Windows/Fonts/impact.ttf"
+    fontcolor: str = "white"
+    bordercolor: str = "black"
+    borderw: int = 3
+
+
+@dataclass(frozen=True)
+class WhisperConfig:
+    # Speed
+    beam_size: int = 1
+    vad_filter: bool = True
+    condition_on_previous_text: bool = False
+    # Safety
+    temperature: float = 0.0
+    best_of: int = 1
+    # Memory stability
+    compression_ratio_threshold: float = 2.4
+    log_prob_threshold: float = -1.0
+
+
+@dataclass(frozen=True)
+class ClipConfig:
+    resize_flags: str = "lanczos"
+
+
+@dataclass(frozen=True)
+class ComposeConfig:
+    codec: str = "libx264"
+    preset: str = "fast"
+    crf: int = 23
+    audio_codec: str = "aac"
+    audio_bitrate: str = "128k"
+
+
+@dataclass(frozen=True)
+class PipelineConfig:
+    """Immutable pipeline configuration."""
+
+    # Whisper
+    whisper_model: str = "base"
+    whisper_device: str = "cuda"
+    whisper_compute: str = "float16"
+
+    # LLM
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
+    llm_temperature: float = 0.3
+    llm_max_chars: int = 30000
+
+    # Paths
+    output_dir: Path = Path("./shorts_output")
+    temp_dir: Path = Path("./temp")
+
+    # Content
+    content_type: str = "general"
+
+    # Format
+    format_name: str = "format1"
+
+    # Video
+    clip: ClipConfig = field(default_factory=ClipConfig)
+    hook: HookConfig = field(default_factory=HookConfig)
+    subscribe: SubscribeConfig = field(default_factory=SubscribeConfig)
+    compose: ComposeConfig = field(default_factory=ComposeConfig)
+
+    # Audio
+    audio: AudioConfig = field(default_factory=AudioConfig)
+
+    # Captions
+    captions: CaptionConfig = field(default_factory=CaptionConfig)
+
+    # Whisper speed/safety
+    whisper: WhisperConfig = field(default_factory=WhisperConfig)
+
+    # GPU
+    gpu_enabled: bool = True
+
+    # Upload
+    upload_enabled: bool = False
+    schedule_days: int = -1
+
+    def output_path(self) -> Path:
+        return self.output_dir.resolve()
+
+    def temp_path(self) -> Path:
+        return self.temp_dir.resolve()
+
+
+def load_env() -> None:
+    """Load .env from pipeline root or cwd."""
+    candidates = [
+        Path(__file__).resolve().parent.parent / ".env",
+        Path.cwd() / ".env",
+    ]
+    for p in candidates:
+        if p.exists():
+            load_dotenv(p)
+            return
+    load_dotenv()
+
+
+def load_format(format_name: str = "format1") -> Dict[str, Any]:
+    """Load a format JSON and return raw dict."""
+    formats_dir = Path(__file__).resolve().parent.parent / "formats"
+    path = formats_dir / f"{format_name}.json"
+    if not path.exists():
+        raise FileNotFoundError(f"Format not found: {path}")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConfig:
+    """Build an immutable PipelineConfig from format JSON + env + overrides.
+
+    Keyword overrides win over everything (for CLI flag injection).
+    """
+    load_env()
+
+    raw = load_format(format_name)
+
+    def _g(section: str, key: str, default: Any = None) -> Any:
+        s = raw.get(section, {})
+        return s.get(key, default) if isinstance(s, dict) else default
+
+    cap_raw = raw.get("captions", {})
+
+    return PipelineConfig(
+        # Whisper
+        whisper_model=os.getenv("WHISPER_MODEL", "base"),
+        whisper_device="cuda" if os.getenv("CUDA_VISIBLE_DEVICES", "") != "-1" else "cpu",
+        whisper_compute="float16" if os.getenv("CUDA_VISIBLE_DEVICES", "") != "-1" else "int8",
+        # LLM
+        groq_api_key=overrides.get("groq_api_key") or os.getenv("GROQ_API_KEY", ""),
+        groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        llm_temperature=float(os.getenv("LLM_TEMPERATURE", "0.3")),
+        llm_max_chars=int(os.getenv("LLM_MAX_CHARS", "30000")),
+        # Content
+        content_type=overrides.get("content_type", "general"),
+
+        # Format
+        format_name=format_name,
+        # Video
+        clip=ClipConfig(
+            resize_flags=_g("clip", "resize_flags", "lanczos"),
+        ),
+        hook=HookConfig(
+            fontsize=int(_g("hook_overlay", "fontsize", 72)),
+            uppercase=bool(_g("hook_overlay", "uppercase", True)),
+            duration=float(_g("hook_overlay", "duration", 2.0)),
+            y=_g("hook_overlay", "y", "h*0.15"),
+            font=str(_g("hook_overlay", "font", "C:/Windows/Fonts/impact.ttf")),
+        ),
+        subscribe=SubscribeConfig(
+            fontsize=int(_g("subscribe_overlay", "fontsize", 48)),
+            text=_g("subscribe_overlay", "text", "SUBSCRIBE"),
+            duration=float(_g("subscribe_overlay", "duration", 1.0)),
+            font=_g("subscribe_overlay", "font", "C:/Windows/Fonts/impact.ttf"),
+            fontcolor=_g("subscribe_overlay", "fontcolor", "white"),
+            bordercolor=_g("subscribe_overlay", "bordercolor", "black"),
+            borderw=int(_g("subscribe_overlay", "borderw", 3)),
+        ),
+        compose=ComposeConfig(
+            codec=_g("compose", "codec", "libx264"),
+            preset=_g("compose", "preset", "fast"),
+            crf=int(_g("compose", "crf", 23)),
+            audio_codec=_g("compose", "audio_codec", "aac"),
+            audio_bitrate=_g("compose", "audio_bitrate", "128k"),
+        ),
+        audio=AudioConfig(
+            highpass=int(_g("audio", "highpass", 80)),
+            lowpass=int(_g("audio", "lowpass", 8000)),
+            noise_reduction=_g("audio", "noise_reduction", "anlmdn=s=6:p=0.05"),
+            normalization=_g("audio", "normalization", "dynaudnorm=f=150:g=15:p=0.95"),
+            bitrate=_g("audio", "bitrate", "192k"),
+            eq=_g("audio", "eq", []),
+            ambient_volume=float(_g("audio", "ambient_volume", 0.90)),
+            intro_duck_volume=float(_g("audio", "intro_duck_volume", 0.70)),
+            crossfade_duration=float(_g("audio", "crossfade_duration", 3.0)),
+        ),
+        captions=CaptionConfig(
+            enabled=not overrides.get("no_captions", False),
+            fontsize=int(cap_raw.get("fontsize", 38)),
+            uppercase=bool(cap_raw.get("uppercase", True)),
+            outline=int(cap_raw.get("outline", 2)),
+            box_border=int(cap_raw.get("box_border", 4)),
+            margin_bottom=int(cap_raw.get("margin_bottom", 160)),
+            box_color=str(cap_raw.get("box_color", "black@0.4")),
+            shadow_color=str(cap_raw.get("shadow_color", "black")),
+            font=str(cap_raw.get("font", "C:/Windows/Fonts/impact.ttf")),
+        ),
+        gpu_enabled=overrides.get("gpu", os.getenv("USE_GPU", "1") == "1"),
+        whisper=WhisperConfig(
+            beam_size=int(_g("whisper", "beam_size", 1)),
+            vad_filter=bool(_g("whisper", "vad_filter", True)),
+            condition_on_previous_text=bool(_g("whisper", "condition_on_previous_text", False)),
+            temperature=float(_g("whisper", "temperature", 0.0)),
+            best_of=int(_g("whisper", "best_of", 1)),
+            compression_ratio_threshold=float(_g("whisper", "compression_ratio_threshold", 2.4)),
+            log_prob_threshold=float(_g("whisper", "log_prob_threshold", -1.0)),
+        ),
+        upload_enabled=overrides.get("upload", False),
+        schedule_days=overrides.get("schedule_days", -1),
+        output_dir=Path(overrides.get("output_dir", "./shorts_output")),
+        temp_dir=Path(overrides.get("temp_dir", "./temp")),
+    )

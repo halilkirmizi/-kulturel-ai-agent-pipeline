@@ -1,0 +1,23 @@
+# Temp & cache
+temp/
+__pycache__/
+*.pyc
+
+# Logs
+logs/
+
+# Editor & IDE
+.Rhistory
+
+# Runtime state & generated artifacts (regeneratable)
+downloads/
+shorts_output/
+memory_store.json
+upload/.upload_quota.json
+upload/.upload_log.json
+
+# Sensitive credentials
+.env
+upload/client_secret.json
+*.pickle
+*.token

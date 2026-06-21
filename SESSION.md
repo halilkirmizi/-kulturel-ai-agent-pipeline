@@ -17,7 +17,7 @@
 | 7 | 2026-06-17 | Minimal pipeline (whisper->LLM->FFmpeg) | ✅ |
 | 8 | 2026-06-18 | Project revival — skeleton setup | ✅ |
 | 9 | 2026-06-18 | Architecture refactor — modular production | ✅ |
-| **10** | **2026-06-21** | **Git remote + CLAUDE/CHANGELOG + SESSION.md işlevi** | **🔄** |
+| **10** | **2026-06-21** | **Git remote + CLAUDE/CHANGELOG + SESSION.md işlevi** | **✅** |
 
 ---
 
@@ -46,6 +46,19 @@
 - `CHANGELOG.md` = ne değişti (git log)
 - `SESSION.md` = konuşma geçmişi yedeği (kararlar + bağlam)
 - `CLAUDE.md` = sabit kurallar (dokunma, sadece değişiklik gerekirse güncelle)
+
+**4. Eski dosyaların derinlemesine analizi**
+- `STATE_CONTRACT.md` — küçümsendi, hatalıydım. Kullanıcı düzeltti: Bu dosya **resmî referans dokümanı**. Runtime'da hata alınınca başvurulacak kaynak. Kod değişince güncellenmeli. Önemli.
+- `MEMORY/ALWAYS.md` — production constraint'ler, content strategy, teknik kurallar. `CLAUDE.md`'de olmayan bilgiler içeriyor (9:16 framing, timing kuralları, content strategist modu).
+- `MEMORY/PROJECT.md` — tamamen güncelliğini yitirmiş next steps (pip install, .env, client_secret — hepsi yapıldı).
+- `MEMORY/ARCHIVE/INDEX.md` — eski session indeksi + terk edilmiş özellikler listesi (Temporal IR, easing curves, Format2 brainrot).
+
+**5. Memory Architecture Proposal**
+- Kullanıcının orijinal tasarımı: short-term (ALWAYS.md) / working (PROJECT.md) / long-term (ARCHIVE/) katmanlı sistem
+- Mevcut sistem (CLAUDE.md + SESSION.md + CHANGELOG.md) ile karşılaştırıldı
+- Kod değişikliği gerektirmediği tespit edildi (MEMORY/ dosyaları sadece Claude içindir, pipeline Python kodları okumaz)
+- `design/memory_architecture_proposal.md` yazıldı — projeyi bilmeyen bir yazılım mühendisinin değerlendirmesi için
+- **Karar:** Henüz uygulanmadı. 2-3 session sonra değerlendirilecek.
 
 ### Current Project State (Özet)
 

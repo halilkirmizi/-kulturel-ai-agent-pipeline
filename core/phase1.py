@@ -150,7 +150,7 @@ def run_phase1(
             log.info("  [K] Skipping (no base topics to enrich)")
         else:
             from obsidian_bridge.graph_query import query_graph
-            _gp = Path(__file__).resolve().parent / "obsidian_bridge" / "graph_store.json"
+            _gp = Path(__file__).resolve().parent.parent / "obsidian_bridge" / "graph_store.json"
             if not _gp.exists():
                 log.warning("  [K] Graph store missing: %s", _gp)
             else:

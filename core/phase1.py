@@ -35,6 +35,16 @@ from editing.ffmpeg_builder import execute, probe_duration, probe_file
 log = get_logger(__name__)
 
 
+# ── Phase 1 Feature Declarations ──────────────────────────────────
+registry.declare("download_video", "core", "yt-dlp video download")
+registry.declare("transcribe", "core", "Whisper GPU/CPU transcription")
+registry.declare("extract_topics", "core", "Keyword extraction from transcript")
+registry.declare("knowledge_graph", "optional", "Obsidian graph enrichment")
+registry.declare("score_clips", "core", "Groq LLM clip scoring")
+registry.declare("crop", "core", "FFmpeg segment crop to 9:16")
+registry.declare("gpu_encode", "optional", "NVENC GPU accelerated encoding (phase1)")
+
+
 class PipelineError(Exception):
     """Base exception for pipeline stage failures."""
 

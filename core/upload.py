@@ -19,6 +19,10 @@ from upload.youtube import upload_with_retry
 log = get_logger(__name__)
 
 
+# ── Upload Feature Declaration ────────────────────────────────────
+registry.declare("upload", "optional", "YouTube Data API upload")
+
+
 class PipelineError(Exception):
     """Base exception for pipeline stage failures."""
 

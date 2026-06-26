@@ -30,20 +30,9 @@ from core.upload import run_upload
 log = get_logger(__name__)
 
 
-# ── Feature declarations ───────────────────────────────────────
+# ── Feature declaration ────────────────────────────────────────
 registry.declare("step_tracker", "core", "Execution step gating with persistence")
-registry.declare("download_video", "core", "yt-dlp video download")
-registry.declare("transcribe", "core", "Whisper GPU/CPU transcription")
-registry.declare("extract_topics", "core", "Keyword extraction from transcript")
-registry.declare("knowledge_graph", "optional", "Obsidian graph enrichment")
-registry.declare("score_clips", "core", "Groq LLM clip scoring")
-registry.declare("crop", "core", "FFmpeg segment crop to 9:16")
-registry.declare("translate", "optional", "Groq LLM translation es->en")
-registry.declare("audio_enhance", "core", "Audio noise reduction and EQ")
-registry.declare("captions", "core", "ASS subtitle generation")
-registry.declare("compose", "core", "Final video composition with overlays")
-registry.declare("gpu_encode", "optional", "NVENC GPU accelerated encoding")
-registry.declare("upload", "optional", "YouTube Data API upload")
+
 
 # ── AOR declarations ─────────────────────────────────────────
 AOR.declare(ArtifactRecord(name="source_video", path_pattern="temp/<id>.mp4", owner="ingest.downloader", lifecycle="ephemeral", delete_policy="end_of_run"))

@@ -41,18 +41,19 @@ except Exception as e:
 # Test 3: Feature registry declarations
 print("\n[TEST 3] Feature registry")
 try:
+    from core.phase1 import registry as _  # triggers phase1 feature declarations
+    from core.phase2 import registry as _  # triggers phase2 feature declarations
+    from core.upload import registry as _   # triggers upload feature declarations
     from core.feature_registry import registry
-    # Note: features are declared in main.py, not in core.feature_registry itself
-    # This test just checks the registry module is functional
-    registry.declare("test_feature", "test", "test description")
-    registry.use("test_feature")
+
     report = registry.report()
-    assert report['total'] == 1
-    assert report['used_count'] == 1
-    print(f"  PASS: Registry functional ({report['total']} test feature)")
+    print(f"  PASS: Registry functional ({report['total']} features from modules)")
+    assert report['total'] >= 7, f"Expected >= 7 features, got {report['total']}"
     results.append(("Feature registry", "PASS"))
 except Exception as e:
     print(f"  FAIL: {e}")
+    import traceback
+    traceback.print_exc()
     results.append(("Feature registry", f"FAIL: {e}"))
 
 # Test 4: DAG resolution

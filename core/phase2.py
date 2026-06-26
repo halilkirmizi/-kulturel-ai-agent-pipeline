@@ -31,6 +31,14 @@ from editing.audio import build_enhance_command
 log = get_logger(__name__)
 
 
+# ── Phase 2 Feature Declarations ──────────────────────────────────
+registry.declare("translate", "optional", "Groq LLM translation es->en")
+registry.declare("audio_enhance", "core", "Audio noise reduction and EQ")
+registry.declare("captions", "core", "ASS subtitle generation")
+registry.declare("compose", "core", "Final video composition with overlays")
+registry.declare("gpu_encode", "optional", "NVENC GPU accelerated encoding (phase2)")
+
+
 class PipelineError(Exception):
     """Base exception for pipeline stage failures."""
 

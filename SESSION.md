@@ -18,6 +18,8 @@
 | 8 | 2026-06-18 | Project revival — skeleton setup | ✅ |
 | 9 | 2026-06-18 | Architecture refactor — modular production | ✅ |
 | **10** | **2026-06-21** | **Git remote + CLAUDE/CHANGELOG + SESSION.md işlevi** | **✅** |
+| **11** | **2026-06-26** | **Pipeline refactor: main.py → 4 modül** | **✅** |
+| **12** | **2026-06-26** | **Feature registry modüllere dağıtıldı, CLAUDE.md güncellendi** | **✅** |
 
 ---
 
@@ -111,3 +113,64 @@
 - LSP errors: downloader.py (yt-dlp type stub), clip_scoring.py (Optional[str] → str) — önceden var, bizden değil
 - Windows `tempfile.mkstemp` PermissionError — pipeline shorts_output/ kullanır, etkilenmez
 - ASS caption'larda Arial font hala hardcoded
+
+---
+
+## Session 11 — 2026-06-26: Pipeline Refactor (main.py → 4 modül)
+
+### Neden main.py bölündü?
+- 763 satır, her şey tek dosyada (download, transcribe, score, crop, compose, upload, CLI)
+- Bir şeyi değiştirmek her şeyi bozuyor
+- Test yazmak imkansızdı
+
+### Ne yapıldı?
+- `core/phase1.py` — download → transcribe → score → crop orchestration
+- `core/phase2.py` — audio enhance → captions → compose orchestration
+- `core/upload.py` — YouTube upload orchestration
+- `core/cli.py` — Arg parsing
+- `main.py` — Sadece orchestration (~140 satır)
+
+### Test sonuçları
+- Unit test: 10/10 PASS
+- E2E: Phase 1 (2 clip) + Phase 2 (final.mp4) başarılı
+- Stres test: 3/3 PASS (aynı video 2x, kısa video, geçersiz API key)
+- AOR: 0 duplicate writer
+
+### Dosya yapısı
+```
+pipeline/
+├── main.py (~140 satır, orchestrator)
+├── core/
+│   ├── phase1.py (~255 satır)
+│   ├── phase2.py (~212 satır)
+│   ├── upload.py (~101 satır)
+│   ├── cli.py (~45 satır)
+│   └── ...
+├── tests/
+│   ├── test_refactor.py
+│   └── REFACTOR_TEST_REPORT_20260626.md
+```
+
+---
+
+## Session 12 — 2026-06-26: Feature Registry + CLAUDE.md Güncelleme
+
+### Feature Registry Modüllere Dağıtıldı
+- Önce: Tüm feature'lar main.py'de declare ediliyordu
+- Sonra: Her modül kendi feature'larını declare ediyor
+- main.py'de sadece step_tracker kaldı
+
+### CLAUDE.md Güncellendi
+- Multi-Part Video Workflow (Altın Kural): 30dk parçalama, kullanıcı onayı
+- Commit Kuralı: Her session sonunda commit, 12 mesajda bir kontrol
+
+### Bilinen Sorunlar
+- Memory Influence: Kod var ama adaptive_mode henüz test edilmedi
+- Graph store path: Düzeltildi ama obsidian bridge hâlâ entegre değil
+- 12 mesaj kuralı: Bu session'da kaçırıldı (yaklaşık 30 mesaj oldu)
+
+### Next Steps
+1. Memory write-back test (adaptive_mode)
+2. Workflow dosyasını güncelle (9:16 crop, yeni yapı)
+3. AOR owner path'leri otomatikleştir
+4. Joe Rogan video testi (multi-part workflow)

@@ -60,7 +60,7 @@ def _build_windows(segments: list, target: float = TARGET_WIN, overlap: float = 
     """Build overlapping windows from whisper segments.
 
     Each window targets ~target seconds with ~overlap seconds of overlap.
-    Windows snap to segment boundaries for clean audio cuts.
+    Windows snap to segment boundaries for clean sentence cuts.
     """
     if not segments:
         return []
@@ -69,6 +69,24 @@ def _build_windows(segments: list, target: float = TARGET_WIN, overlap: float = 
     total_dur = max(ends)
     step = target - overlap
 
+    # Build list of all segment boundaries for snapping
+    all_starts = sorted({s.start for s in segments})
+    all_ends = sorted({s.end for s in segments})
+
+    def _snap_to_start(t: float) -> float:
+        """Snap time to nearest segment start (round down)."""
+        for st in reversed(all_starts):
+            if st <= t:
+                return st
+        return all_starts[0]
+
+    def _snap_to_end(t: float) -> float:
+        """Snap time to nearest segment end (round up)."""
+        for ed in all_ends:
+            if ed >= t:
+                return ed
+        return all_ends[-1]
+
     windows: List[_Window] = []
     cur_start = 0.0
     wid = 0
@@ -76,17 +94,21 @@ def _build_windows(segments: list, target: float = TARGET_WIN, overlap: float = 
     while cur_start < total_dur - 2:
         cur_end = min(cur_start + target, total_dur)
 
+        # Snap to segment boundaries
+        snap_start = _snap_to_start(cur_start)
+        snap_end = _snap_to_end(cur_end)
+
         seg_texts = []
         for s in segments:
-            if s.end <= cur_start:
+            if s.end <= snap_start:
                 continue
-            if s.start >= cur_end:
+            if s.start >= snap_end:
                 break
             if s.text and s.text.strip():
                 seg_texts.append(s.text.strip())
 
         text = " ".join(seg_texts)
-        windows.append(_Window(wid=wid, start=cur_start, end=cur_end, text=text))
+        windows.append(_Window(wid=wid, start=snap_start, end=snap_end, text=text))
         wid += 1
         cur_start += step
 
@@ -137,14 +159,38 @@ def _build_transcript_snippet(segments: list, max_chars: int = 30000) -> str:
     return full
 
 
-def _build_window_listing(windows: List[_Window], max_chars: int = 15000) -> str:
-    """Build a compact listing of all windows for the LLM prompt."""
+def _build_window_listing(windows: List[_Window], segments: list, max_chars: int = 15000) -> str:
+    """Build a compact listing of all windows for the LLM prompt.
+
+    Includes sentence boundary info so LLM can evaluate narrative completeness.
+    """
     lines = ["=== SCORING CANDIDATES (overlapping windows) ==="]
+    lines.append("")
+    lines.append("Each window shows its start/end segments so you can see if")
+    lines.append("sentences begin and end cleanly. Prefer windows where the first")
+    lines.append("and last segments are COMPLETE sentences (not cut off mid-sentence).")
+    lines.append("")
+
     for w in windows:
         start_s = f"{int(w.start // 60):02d}:{w.start % 60:04.1f}"
         end_s = f"{int(w.end // 60):02d}:{w.end % 60:04.1f}"
-        preview = w.text[:100].replace("\n", " ")
-        lines.append(f"WIN-{w.wid:03d}  [{start_s} -> {end_s}]  {preview}")
+
+        # Find segments that start/end at window boundaries
+        first_segs = [s for s in segments if abs(s.start - w.start) < 0.5]
+        last_segs = [s for s in segments if abs(s.end - w.end) < 0.5]
+
+        first_text = first_segs[0].text.strip() if first_segs else "..."
+        last_text = last_segs[-1].text.strip() if last_segs else "..."
+
+        # Truncate for display
+        first_preview = first_text[:80].replace("\n", " ")
+        last_preview = last_text[:80].replace("\n", " ")
+
+        lines.append(f"WIN-{w.wid:03d} [{start_s} -> {end_s}] ({w.end-w.start:.0f}s)")
+        lines.append(f"  STARTS WITH: \"{first_preview}...\"")
+        lines.append(f"  ENDS WITH:   \"{last_preview}...\"")
+        lines.append("")
+
     full = "\n".join(lines)
     if len(full) > max_chars:
         full = full[:max_chars]
@@ -235,7 +281,7 @@ def _fallback_clip(segments: list) -> Optional[ScoredClip]:
 # ── Main scoring function ──────────────────────
 
 
-CLIP_SYSTEM_PROMPT = """You are a clip selection engine for analytical YouTube Shorts.
+CLIP_SYSTEM_PROMPT = """You are a clip selection engine for YouTube Shorts.
 Your job: select 2-4 windows from the candidate list below that work best as standalone Shorts.
 
 Each candidate window is labeled WIN-XXX with its timestamp range and text preview.
@@ -247,15 +293,16 @@ Scoring criteria (each 0-10):
 - narrative_completeness: can this stand alone (has context + payoff)?
 
 Rules:
-- Select windows that are narratively complete (beginning → context → conclusion).
+- Select windows where the FIRST and LAST sentences are complete (not cut off mid-sentence).
 - Prefer windows with clear argument, fact, or story — not filler.
+- AVOID: greetings, transitions, incomplete thoughts, small talk.
 - Pick diverse moments across the full video length; WIN-IDs far apart are better.
 - Return ONLY valid JSON with this exact structure:
 {
   "selections": [
     {
       "window_id": 3,
-      "hook_text": "2-4 word text overlay summary",
+      "hook_text": "2-4 word attention-grabbing summary that makes people want to watch",
       "intro_script": "5-8 second spoken hook (1-2 sentences to grab attention)",
       "outro_script": "5-10 second closing thought or context",
       "reason": "why this works as a short (max 20 words)",
@@ -303,7 +350,7 @@ def score_clips(
         return [fb] if fb else []
 
     transcript = _build_transcript_snippet(segments, max_chars=config.llm_max_chars)
-    window_listing = _build_window_listing(windows, max_chars=config.llm_max_chars // 2)
+    window_listing = _build_window_listing(windows, segments, max_chars=config.llm_max_chars // 2)
 
     client = Groq(api_key=config.groq_api_key)
 

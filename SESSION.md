@@ -5,6 +5,25 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-06-30 (session sonu)
+
+**Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
+**Test:** `python tests/run_all.py` → **8/8 suite, 90/90 check PASS** (refactor, reframe, captions_karaoke, silence, integration_ffmpeg, performance, framing, formats).
+
+**Bu oturumda eklenen (hepsi opt-in, testli, regresyonsuz):**
+- #1 yüz takipli crop (`--auto-reframe`)
+- #3a karaoke altyazı (`--karaoke`)
+- #3b sessizlik-kesme (`--trim-silence`, transkript-öncesi)
+- #2 performans geri besleme (upload→video_id+provenance, `--fetch-analytics`→performance_score)
+- `fit` çerçeveleme (`--framing fit`) + `format_subtitled` profili (gömülü altyazılı kaynaklar)
+- Bug fix: Windows `rename`→`replace`; kapsamlı test runner `tests/run_all.py`
+
+**Sıradaki tek büyük iş:** `learning_engine` — performance_score → klip-seçim ağırlıkları (ROADMAP STEP 3, simulation-first). Geri besleme döngüsünü kapatır.
+**Test edilmeyen (kullanıcı tetikler):** gerçek YouTube URL ile Phase 1 E2E; gerçek upload + 1-2 gün sonra `--fetch-analytics` canlı stats.
+**Kural:** Her feature sonunda `tests/run_all.py` (büyük çaplı test) çalıştır.
+
+---
+
 ## Session History
 
 | Session | Date | Focus | Status |

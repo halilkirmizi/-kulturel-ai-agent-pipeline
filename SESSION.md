@@ -5,10 +5,12 @@
 
 ---
 
-## GÜNCEL DURUM — 2026-06-30 (session sonu)
+## GÜNCEL DURUM — 2026-06-30
 
 **Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
-**Test:** `python tests/run_all.py` → **8/8 suite, 90/90 check PASS** (refactor, reframe, captions_karaoke, silence, integration_ffmpeg, performance, framing, formats).
+**Test:** `python tests/run_all.py` → **9/9 suite, 102/102 check PASS** (+learning).
+
+**learning_engine eklendi (SİMÜLASYON):** `--propose-weights` performans verisinden boyut-ağırlığı + feature lift önerir, weights_vN.json yazar, ASLA uygulamaz. Geri besleme döngüsünün "öğrenme" hesabı artık var; tek kalan onu config'e UYGULAMAK (canlı mod, gerçek veri biriktikten sonra).
 
 **Bu oturumda eklenen (hepsi opt-in, testli, regresyonsuz):**
 - #1 yüz takipli crop (`--auto-reframe`)
@@ -21,6 +23,36 @@
 **Sıradaki tek büyük iş:** `learning_engine` — performance_score → klip-seçim ağırlıkları (ROADMAP STEP 3, simulation-first). Geri besleme döngüsünü kapatır.
 **Test edilmeyen (kullanıcı tetikler):** gerçek YouTube URL ile Phase 1 E2E; gerçek upload + 1-2 gün sonra `--fetch-analytics` canlı stats.
 **Kural:** Her feature sonunda `tests/run_all.py` (büyük çaplı test) çalıştır.
+
+---
+
+## Session 22 — 2026-06-30: learning_engine (simülasyon-önce)
+
+### Yapıldı (ROADMAP STEP 3)
+- **core/learning_engine.py (yeni, saf, LLM yok):**
+  - `compute_dimension_weights(records)` — performansla *birlikte yükselen* boyuta >1.0 çarpan (clamp 0.5–1.5), düz boyuta ~1.0. Az örnekte ({}).
+  - `compute_feature_lift(records)` — her feature ON vs OFF ortalama performans farkı (tek grup → None).
+  - `propose_weights(records)` — `applied:false`, low_confidence bayrağı (MIN_SAMPLES=3).
+  - `save_proposal` — `weights/weights_vN.json`, asla üzerine yazmaz (Rule 4).
+- **CLI `--propose-weights`** (erken-çıkış, simülasyon). main'de versiyon path'ten okunur.
+- **.gitignore:** `weights/`.
+
+### Disiplin (ROADMAP kuralları)
+- Rule 1: gerçek-zamanlı mutasyon YOK; pipeline sonrası, sadece öneri yazar.
+- Rule 2: LLM YOK, deterministik.
+- Rule 4: versiyonlu, üzerine yazmaz.
+- **Hiçbir şey weights'i geri okumuyor** → şu an saf gözlem/simülasyon.
+
+### Bug fix
+- main: `proposal['version']` KeyError (save_proposal versiyonu yerel kopyaya ekliyordu) → versiyon `path.stem`'den okunuyor.
+
+### Test
+- `tests/test_learning.py` 12/12 PASS. Tam matris: **9/9 suite, 102/102 check PASS**.
+- Canlı komut: `python main.py --propose-weights` (0 örnek → low_confidence nötr öneri, güvenli).
+
+### Sıradaki (döngüyü kapatmak için son adım)
+1. Gerçek veri biriktir: `--upload` → 1-2 gün → `--fetch-analytics` → `--propose-weights`.
+2. CANLI mod: bir weights_vN proposal'ını ControlArbiter scoring_bias'a bağla (ROADMAP STEP 5, ayrı + dikkatli; influence ≤30%, DAG/AOR/Contract ezilmez).
 
 ---
 

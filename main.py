@@ -134,6 +134,19 @@ def main(argv=None) -> None:
         store.save()
         print(f"Updated. {store.summary()}")
         return
+    if args.propose_weights:
+        from core.performance import PerformanceStore
+        from core.upload import PERF_STORE
+        from core.learning_engine import propose_weights, save_proposal
+        store = PerformanceStore(PERF_STORE)
+        proposal = propose_weights(list(store.records.values()))
+        path = save_proposal(proposal, _HERE / "weights")
+        print(f"[SIMULATION] proposal {path.stem} -> {path}")
+        print(f"  samples={proposal['n_samples']} low_confidence={proposal['low_confidence']}")
+        print(f"  dimension_weights={proposal['dimension_weights']}")
+        print(f"  feature_lift={proposal['feature_lift']}")
+        print("  NOTE: not applied — simulation only.")
+        return
 
     # Memory dry-run flag — passed to _run_memory_writer after pipeline
     _memory_dry_run = args.memory_dry_run

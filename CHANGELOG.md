@@ -17,3 +17,4 @@
 2026-06-30: Fix: Path.rename -> Path.replace (phase1 clip.mp4, phase2 final.mp4) — Windows'ta yeniden render'da "dosya zaten var" hatası (rename üzerine yazmıyor, replace yazıyor)
 2026-06-30: Add: 'fit' framing (`--framing fit`) — yatay kareyi tam genişlikte 9:16 tuvale sığdırır + bulanık arka plan dolgusu; tam-genişlik gömülü altyazılar kesilmez. Default 'crop' (render_core._build_fit_command)
 2026-06-30: Add: format_subtitled profili — gömülü altyazılı kaynaklar için (framing=fit + captions kapalı). Kullanım: `--format format_subtitled`. captions.enabled artık format JSON'dan da okunuyor
+2026-06-30: Add: learning_engine (SİMÜLASYON, ROADMAP STEP 3) — performance_score'dan boyut-ağırlığı + feature lift önerir, versiyonlu weights_vN.json yazar, ASLA uygulamaz. `--propose-weights` (core/learning_engine.py)

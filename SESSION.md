@@ -20,6 +20,7 @@
 | **10** | **2026-06-21** | **Git remote + CLAUDE/CHANGELOG + SESSION.md işlevi** | **✅** |
 | **11** | **2026-06-26** | **Pipeline refactor: main.py → 4 modül** | **✅** |
 | **12** | **2026-06-26** | **Feature registry modüllere dağıtıldı, CLAUDE.md güncellendi** | **✅** |
+| **13** | **2026-06-30** | **Stabilizasyon: legacy dış git deposu arşivlendi, çalışma ağacı temizlendi** | **✅** |
 
 ---
 
@@ -174,3 +175,27 @@ pipeline/
 2. Workflow dosyasını güncelle (9:16 crop, yeni yapı)
 3. AOR owner path'leri otomatikleştir
 4. Joe Rogan video testi (multi-part workflow)
+
+---
+
+## Session 13 — 2026-06-30: Stabilizasyon
+
+### Sorun
+- `kulturel AI agent/` klasöründe **iki git deposu iç içeydi**:
+  - `pipeline/.git` → gerçek, güncel repo (branch `main`, GitHub remote'lu, senkron)
+  - `kulturel AI agent/.git` → eski "GPU pipeline" deposu (branch `master`, remote YOK), aynı dosyaları çift izliyordu
+- Bu yüzden klasörde `git status` yanıltıcıydı: pipeline tertemiz olmasına rağmen "her şey değişmiş" görünüyordu.
+
+### Ne yapıldı
+1. **Legacy dış depo arşivlendi** (silinmedi): `kulturel AI agent/.git` → `01_Projects/_archive/legacy_kulturel_outer_git_20260630/git_folder`. Geri alınabilir. Boyut 277K, master, remote yok → kayıp riski yok.
+2. **Doğrulama:** `kulturel AI agent/` artık üst vault deposuna ait (`rev-parse --show-toplevel` → SecondBrain-vault). İç pipeline reposu bağımsız ve sağlam.
+3. **Kaydedilmemiş tek değişiklik commit'lendi:** `editing/render_core.py` — crop komutuna 2 satır açıklama yorumu (mantık değişikliği yok). Commit `a85a55e`.
+4. **GitHub'a push'landı** → `pipeline` reposu origin/main ile tam senkron, çalışma ağacı temiz.
+
+### Sonuç
+- Tek aktif depo: `pipeline/.git` (temiz + yedekli).
+- Kod/test durumu değişmedi (Session 11/12'deki yeşil durum korunuyor).
+
+### Next Steps (devam, Session 12'den taşındı)
+1. Memory write-back test (adaptive_mode) — hâlâ test edilmemiş en büyük risk
+2. `_archive`'daki legacy git'i birkaç hafta sorun çıkmazsa tamamen sil

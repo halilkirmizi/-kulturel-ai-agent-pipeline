@@ -28,6 +28,7 @@
 | **18** | **2026-06-30** | **#2 Performans geri besleme katmanı (video_id + analytics + score)** | **✅** |
 | **19** | **2026-06-30** | **Canlı render testi (karaoke) + Windows rename->replace fix + test runner** | **✅** |
 | **20** | **2026-06-30** | **'fit' framing (tam genişlik + bulanık dolgu) — gömülü altyazı kesilmesin** | **✅** |
+| **21** | **2026-06-30** | **format_subtitled profili (fit + altyazı kapalı) — kaynak türüne göre otomatik** | **✅** |
 
 ---
 
@@ -383,6 +384,24 @@ refactor 10/10 · reframe 10/10 · karaoke 9/9 · silence 16/16 · integration 8
 ### Açık karar
 - fit dolgu stili şimdilik bulanık-bg. Alternatif (siyah bar) istenirse tek satır değişiklik. Kullanıcı fit demosunu izliyor.
 
+---
+
+## Session 21 — 2026-06-30: format_subtitled profili (kaynak türüne göre otomatik)
+
+### İstek (kullanıcı)
+- "Altyazısı gömülü videoları bu şekilde (fit + altyazısız) editle; diğerlerini değil." → her seferinde flag yazmak yerine kaynak türüne göre profil.
+
+### Çözüm
+- **formats/format_subtitled.json (yeni):** `clip.framing="fit"` + `captions.enabled=false`. Gömülü altyazılı yatay kaynaklar için.
+- **config.py:** `captions.enabled` artık format JSON'dan da okunuyor (`cap_raw.get("enabled", True) AND not --no-captions`). Önceden sadece `--no-captions` kontrol ediyordu.
+- **Kullanım:**
+  - Gömülü altyazılı kaynak → `python main.py <link> --format format_subtitled` (fit + bizim altyazı kapalı, çift altyazı yok)
+  - Normal video → default `format1` (crop + karaoke/altyazı)
+
+### Doğrulama
+- `tests/test_formats.py` 7/7 PASS (default değişmedi; subtitled profili fit+captions-off; flag etkileşimleri).
+- Tam matris: **8/8 suite, 90/90 check PASS**.
+
 ### Next Steps
-1. Kullanıcı onayı: fit görünümü iyi mi (bulanık bg vs siyah bar)?
-2. learning_engine / gerçek Phase 1 E2E
+1. learning_engine (performance_score → weight, simulation-first)
+2. Gerçek YouTube URL ile Phase 1 E2E (`--format format_subtitled` veya `--auto-reframe --trim-silence`)

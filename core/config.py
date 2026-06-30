@@ -255,7 +255,9 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
             crossfade_duration=float(_g("audio", "crossfade_duration", 3.0)),
         ),
         captions=CaptionConfig(
-            enabled=not overrides.get("no_captions", False),
+            # Disabled by the --no-captions flag OR by the format ("enabled": false,
+            # e.g. for sources that already have burned-in subtitles).
+            enabled=bool(cap_raw.get("enabled", True)) and not overrides.get("no_captions", False),
             fontsize=int(cap_raw.get("fontsize", 38)),
             uppercase=bool(cap_raw.get("uppercase", True)),
             outline=int(cap_raw.get("outline", 2)),

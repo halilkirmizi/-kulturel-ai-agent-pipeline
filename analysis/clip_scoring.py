@@ -159,36 +159,66 @@ def _build_transcript_snippet(segments: list, max_chars: int = 30000) -> str:
     return full
 
 
-def _build_window_listing(windows: List[_Window], segments: list, max_chars: int = 15000) -> str:
-    """Build a compact listing of all windows for the LLM prompt.
+# Openers that usually signal the window starts mid-thought (references unseen context).
+_MID_THOUGHT_OPENERS = {
+    "and", "but", "so", "because", "which", "that", "this", "these", "those",
+    "it", "they", "also", "then", "however", "therefore", "yeah", "ok", "okay",
+    "well", "plus", "anyway", "actually", "again", "still", "thus", "hence",
+}
 
-    Includes sentence boundary info so LLM can evaluate narrative completeness.
+
+def _opens_mid_thought(text: str) -> bool:
+    """Heuristic: does this text open by referencing something unseen?"""
+    t = (text or "").strip()
+    if not t:
+        return False
+    first = re.split(r"[\s,]+", t, 1)[0].lower().strip(".,!?;:\"'")
+    return first in _MID_THOUGHT_OPENERS
+
+
+def _build_window_listing(
+    windows: List[_Window], segments: list, max_chars: int = 15000, rich: bool = True
+) -> str:
+    """Build a listing of all candidate windows for the LLM prompt.
+
+    rich=True (default): shows each window's FULL text so the model can actually
+    judge content quality (the previous preview-only listing made it select
+    blind). rich=False keeps the legacy start/end preview behaviour.
     """
-    lines = ["=== SCORING CANDIDATES (overlapping windows) ==="]
-    lines.append("")
-    lines.append("Each window shows its start/end segments so you can see if")
-    lines.append("sentences begin and end cleanly. Prefer windows where the first")
-    lines.append("and last segments are COMPLETE sentences (not cut off mid-sentence).")
-    lines.append("")
+    lines = ["=== SCORING CANDIDATES (overlapping windows) ===", ""]
+    if rich:
+        lines += [
+            "Each window shows its FULL text. Read it and judge it on its own merits:",
+            "does it stand alone, open with a hook, and finish a complete thought?",
+            "A \"!! starts mid-thought\" flag means the opening references unseen context.",
+            "",
+        ]
+    else:
+        lines += [
+            "Each window shows its start/end segments so you can see if",
+            "sentences begin and end cleanly. Prefer windows where the first",
+            "and last segments are COMPLETE sentences (not cut off mid-sentence).",
+            "",
+        ]
 
     for w in windows:
         start_s = f"{int(w.start // 60):02d}:{w.start % 60:04.1f}"
         end_s = f"{int(w.end // 60):02d}:{w.end % 60:04.1f}"
+        flag = "  !! starts mid-thought" if _opens_mid_thought(w.text) else ""
+        lines.append(f"WIN-{w.wid:03d} [{start_s} -> {end_s}] ({w.end-w.start:.0f}s){flag}")
 
-        # Find segments that start/end at window boundaries
-        first_segs = [s for s in segments if abs(s.start - w.start) < 0.5]
-        last_segs = [s for s in segments if abs(s.end - w.end) < 0.5]
-
-        first_text = first_segs[0].text.strip() if first_segs else "..."
-        last_text = last_segs[-1].text.strip() if last_segs else "..."
-
-        # Truncate for display
-        first_preview = first_text[:80].replace("\n", " ")
-        last_preview = last_text[:80].replace("\n", " ")
-
-        lines.append(f"WIN-{w.wid:03d} [{start_s} -> {end_s}] ({w.end-w.start:.0f}s)")
-        lines.append(f"  STARTS WITH: \"{first_preview}...\"")
-        lines.append(f"  ENDS WITH:   \"{last_preview}...\"")
+        if rich:
+            body = (w.text or "").strip().replace("\n", " ")
+            if len(body) > 600:
+                body = body[:600] + "…"
+            lines.append(f'  TEXT: "{body}"')
+        else:
+            first_segs = [s for s in segments if abs(s.start - w.start) < 0.5]
+            last_segs = [s for s in segments if abs(s.end - w.end) < 0.5]
+            first_text = first_segs[0].text.strip() if first_segs else "..."
+            last_text = last_segs[-1].text.strip() if last_segs else "..."
+            lines.append(f"  STARTS WITH: \"{first_text[:80].replace(chr(10), ' ')}...\"")
+            lines.append(f"  ENDS WITH:   \"{last_text[:80].replace(chr(10), ' ')}...\"")
         lines.append("")
 
     full = "\n".join(lines)
@@ -282,22 +312,31 @@ def _fallback_clip(segments: list) -> Optional[ScoredClip]:
 
 
 CLIP_SYSTEM_PROMPT = """You are a clip selection engine for YouTube Shorts.
-Your job: select 2-4 windows from the candidate list below that work best as standalone Shorts.
+Select the 2-4 BEST windows from the candidate list that work as standalone Shorts.
 
-Each candidate window is labeled WIN-XXX with its timestamp range and text preview.
+You are shown each window's FULL text. READ IT — judge content, not just the edges.
+
+A great Short clip:
+- Opens with a HOOK in its first sentence (a question, bold claim, or surprising statement).
+- Is SELF-CONTAINED: a viewer with ZERO context understands it.
+- Has a complete arc (setup -> payoff). It does not stop mid-thought.
+- Delivers a specific idea, fact, or story — not filler.
+
+REJECT a window if it:
+- Is flagged "!! starts mid-thought", or opens with and/so/but/this/it/that/because...
+- References unseen context ("as I mentioned", "like I said", "going back to...").
+- Is a greeting, intro, outro, transition, housekeeping, or vague small talk.
+- Is an enumeration/list with no payoff.
 
 Scoring criteria (each 0-10):
-- curiosity: does this spark curiosity or present a surprising idea?
-- emotional_relevance: does it connect on a human level (anger, awe, wonder)?
-- educational_value: how much specific, factual information does it contain?
-- narrative_completeness: can this stand alone (has context + payoff)?
+- curiosity: sparks curiosity or presents a surprising idea?
+- emotional_relevance: connects on a human level (anger, awe, wonder)?
+- educational_value: specific, factual information density?
+- narrative_completeness: stands alone with context + payoff?
 
-Rules:
-- Select windows where the FIRST and LAST sentences are complete (not cut off mid-sentence).
-- Prefer windows with clear argument, fact, or story — not filler.
-- AVOID: greetings, transitions, incomplete thoughts, small talk.
-- Pick diverse moments across the full video length; WIN-IDs far apart are better.
-- Return ONLY valid JSON with this exact structure:
+Be HARSH: give 7+ ONLY to windows you would personally watch to the end.
+Pick diverse moments across the full video (WIN-IDs far apart are better).
+Return ONLY valid JSON with this exact structure:
 {
   "selections": [
     {
@@ -350,7 +389,10 @@ def score_clips(
         return [fb] if fb else []
 
     transcript = _build_transcript_snippet(segments, max_chars=config.llm_max_chars)
-    window_listing = _build_window_listing(windows, segments, max_chars=config.llm_max_chars // 2)
+    window_listing = _build_window_listing(
+        windows, segments, max_chars=config.llm_max_chars // 2,
+        rich=not getattr(config, "legacy_select", False),
+    )
 
     client = Groq(api_key=config.groq_api_key)
 

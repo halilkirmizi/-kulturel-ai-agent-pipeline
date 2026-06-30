@@ -18,3 +18,4 @@
 2026-06-30: Add: 'fit' framing (`--framing fit`) — yatay kareyi tam genişlikte 9:16 tuvale sığdırır + bulanık arka plan dolgusu; tam-genişlik gömülü altyazılar kesilmez. Default 'crop' (render_core._build_fit_command)
 2026-06-30: Add: format_subtitled profili — gömülü altyazılı kaynaklar için (framing=fit + captions kapalı). Kullanım: `--format format_subtitled`. captions.enabled artık format JSON'dan da okunuyor
 2026-06-30: Add: learning_engine (SİMÜLASYON, ROADMAP STEP 3) — performance_score'dan boyut-ağırlığı + feature lift önerir, versiyonlu weights_vN.json yazar, ASLA uygulamaz. `--propose-weights` (core/learning_engine.py)
+2026-06-30: Fix: klip seçim kalitesi — LLM artık pencerelerin TAM metnini görüyor (önceden sadece baş/son önizleme → kör seçim). Mid-thought işaretleme + sertleştirilmiş prompt. Eski davranış `--legacy-select`. JSON sözleşmesi değişmedi. Gerçek A/B: yeni mod açılış klibini buldu + örtüşen klipleri eledi (clip_scoring.py)

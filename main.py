@@ -86,6 +86,7 @@ def main(argv=None) -> None:
     config = build_config(
         format_name=args.format,
         content_type=args.content_type,
+        legacy_select=args.legacy_select,
         framing=args.framing,
         auto_reframe=args.auto_reframe,
         gpu=args.gpu,

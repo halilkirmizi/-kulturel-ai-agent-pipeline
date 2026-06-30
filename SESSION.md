@@ -8,7 +8,8 @@
 ## GÜNCEL DURUM — 2026-06-30
 
 **Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
-**Test:** `python tests/run_all.py` → **9/9 suite, 102/102 check PASS** (+learning).
+**Test:** `python tests/run_all.py` → **10/10 suite, 116/116 check PASS** (+learning, +clip_selection).
+**Klip seçim kalitesi düzeltildi:** LLM artık pencerelerin tam metnini görüyor (önceden kör). `--legacy-select` ile eskiye dönülür. Gerçek A/B yapısal iyileşmeyi gösterdi.
 
 **learning_engine eklendi (SİMÜLASYON):** `--propose-weights` performans verisinden boyut-ağırlığı + feature lift önerir, weights_vN.json yazar, ASLA uygulamaz. Geri besleme döngüsünün "öğrenme" hesabı artık var; tek kalan onu config'e UYGULAMAK (canlı mod, gerçek veri biriktikten sonra).
 
@@ -23,6 +24,29 @@
 **Sıradaki tek büyük iş:** `learning_engine` — performance_score → klip-seçim ağırlıkları (ROADMAP STEP 3, simulation-first). Geri besleme döngüsünü kapatır.
 **Test edilmeyen (kullanıcı tetikler):** gerçek YouTube URL ile Phase 1 E2E; gerçek upload + 1-2 gün sonra `--fetch-analytics` canlı stats.
 **Kural:** Her feature sonunda `tests/run_all.py` (büyük çaplı test) çalıştır.
+
+---
+
+## Session 23 — 2026-06-30: Klip Seçim Kalitesi Düzeltmesi
+
+### Kök neden
+- `_build_window_listing` LLM'e her aday pencerenin sadece **baş/son cümle önizlemesini** veriyordu (~80 char). Model pencerelerin **içeriğini görmeden** seçim yapıyordu → kötü klipler.
+
+### Düzeltme (pipeline kırılmadan — JSON sözleşmesi + return tipi aynı)
+- **clip_scoring.py:** `_build_window_listing(rich=True)` artık pencerenin **TAM metnini** (≤600 char) gösteriyor. `_opens_mid_thought()` ile cümle-ortası başlayan pencereler "!! starts mid-thought" işaretleniyor. Prompt sertleştirildi (net "REJECT" kuralları, "be HARSH", tam metni oku).
+- **Geri dönüş kapısı:** `--legacy-select` / `legacy_select` config → eski önizleme davranışı. Default = yeni (rich).
+- Window building, validation, fallback, sort — hepsi değişmedi.
+
+### Gerçek A/B kanıtı (temp/XyU3zRLJ-Xs.mp4, 3.3dk, CPU whisper + 2 Groq çağrısı)
+- LEGACY: 2 klip **birbiriyle örtüşüyordu** (128-159 + 146-167), [1] mid-thought başlıyordu, skorlar 30-31 (şişkin).
+- RICH: **0-29s açılış klibini buldu** (legacy kaçırmıştı), örtüşmeyi eledi, çeşitli (0/84/146), skorlar 25-29 (ayırt edici).
+
+### Test
+- `tests/test_clip_selection.py` 14/14 PASS (mid-thought, tam-metin liste, legacy fallback, prompt, config).
+- Tam matris: **10/10 suite, 116/116 check PASS**.
+
+### Not
+- Gerçek "kalite" subjektif; A/B yapısal iyileşmeyi gösteriyor (içerik görünürlüğü, örtüşme elenmesi, hook bulma). Daha fazla iyileşme istenirse: örtüşen pencereleri dedupe, fallback klip kalitesi, window boyut ayarı.
 
 ---
 

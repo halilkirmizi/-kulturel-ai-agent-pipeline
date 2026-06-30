@@ -122,6 +122,10 @@ class PipelineConfig:
     # to revert to the old preview-only listing.
     legacy_select: bool = False
 
+    # Apply learned scoring-dimension weights (closes the feedback loop). Opt-in;
+    # no-op until a confident weights proposal exists.
+    apply_weights: bool = False
+
     # Reframe (subject-aware crop). Opt-in; default keeps centre crop.
     auto_reframe: bool = False
 
@@ -213,6 +217,7 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         # Content
         content_type=overrides.get("content_type", "general"),
         legacy_select=overrides.get("legacy_select", False),
+        apply_weights=overrides.get("apply_weights", False),
         framing=overrides.get("framing", _g("clip", "framing", "crop")),
         auto_reframe=overrides.get("auto_reframe", False),
         trim_silence=overrides.get("trim_silence", False),

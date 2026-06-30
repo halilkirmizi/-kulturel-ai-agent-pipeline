@@ -103,3 +103,29 @@ def save_proposal(proposal: Dict[str, Any], weights_dir: Path) -> Path:
     path = weights_dir / f"weights_v{n}.json"
     path.write_text(json.dumps(proposal, indent=2, ensure_ascii=False), encoding="utf-8")
     return path
+
+
+def load_latest_weights(weights_dir: Path) -> Dict[str, float]:
+    """Return the dimension_weights of the highest-version, confident proposal.
+
+    Returns {} when there is no usable proposal — so applying weights is a no-op
+    until enough real data has produced a confident one.
+    """
+    weights_dir = Path(weights_dir)
+    if not weights_dir.exists():
+        return {}
+    best = None  # (version, weights)
+    for p in weights_dir.glob("weights_v*.json"):
+        m = re.match(r"weights_v(\d+)\.json$", p.name)
+        if not m:
+            continue
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if data.get("low_confidence") or not data.get("dimension_weights"):
+            continue
+        v = int(m.group(1))
+        if best is None or v > best[0]:
+            best = (v, data["dimension_weights"])
+    return best[1] if best else {}

@@ -230,9 +230,25 @@ def run_phase1(
     except Exception as _exc:
         log.warning("  [K] Knowledge graph lookup failed: %s", _exc)
 
+    # Optional: apply learned dimension weights (closes the feedback loop). No-op
+    # until a confident weights proposal exists. Opt-in via --apply-weights.
+    _dim_weights = None
+    if getattr(config, "apply_weights", False):
+        try:
+            from core.learning_engine import load_latest_weights
+            _wdir = Path(__file__).resolve().parent.parent / "weights"
+            _dim_weights = load_latest_weights(_wdir) or None
+            if _dim_weights:
+                log.info("  [learn] applying weights: %s", _dim_weights)
+            else:
+                log.info("  [learn] no confident weights yet — equal weighting")
+        except Exception as _exc:
+            log.warning("  [learn] weight load failed: %s — equal weighting", _exc)
+
     try:
         log.info("[4/5] Scoring clips via LLM...")
-        scored = score_clips(segments, config, topics=topics, memory_bias=memory_bias)
+        scored = score_clips(segments, config, topics=topics, memory_bias=memory_bias,
+                             dim_weights=_dim_weights)
         AOR.register_write("scored_clips", "memory", __name__)
         if not scored:
             raise PipelineError("No clips selected by LLM")

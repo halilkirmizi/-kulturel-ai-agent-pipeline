@@ -288,6 +288,18 @@ def _parse_llm_json(text: str) -> dict:
     return json.loads(clean)
 
 
+def _weighted_total(scores: dict, dim_weights: Optional[dict]) -> float:
+    """Sum of dimension scores, optionally re-weighted by learned multipliers.
+
+    With no weights this is the plain sum (unchanged behaviour). Weights are
+    bounded multipliers (learning_engine clamps to 0.5..1.5) so a learned bias
+    re-ranks clips without dominating.
+    """
+    if not dim_weights:
+        return sum(scores.values())
+    return sum(v * float(dim_weights.get(d, 1.0)) for d, v in scores.items())
+
+
 # ── Overlap dedupe ─────────────────────────────
 
 
@@ -424,6 +436,7 @@ def score_clips(
     config: PipelineConfig,
     topics: Optional[List[str]] = None,
     memory_bias: Optional[Dict[str, Any]] = None,
+    dim_weights: Optional[Dict[str, float]] = None,
 ) -> List[ScoredClip]:
     """Run LLM-based clip scoring and selection using window-based segmentation.
 
@@ -442,6 +455,9 @@ def score_clips(
 
     if not config.groq_api_key:
         raise ValueError("GROQ_API_KEY not set — cannot run clip scoring")
+
+    if dim_weights:
+        log.info("Applying learned dimension weights: %s", dim_weights)
 
     # Build windows and transcript
     windows = _build_windows(segments)
@@ -532,7 +548,7 @@ def score_clips(
             continue
 
         scores = _validate_and_fix_scores(sel.get("scores", {}))
-        total = sum(scores.values())
+        total = _weighted_total(scores, dim_weights)
 
         sc = ScoredClip(
             start=start,

@@ -51,6 +51,8 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
                         help="Fetch YouTube stats for uploaded videos and score performance")
     parser.add_argument("--propose-weights", action="store_true",
                         help="SIMULATION: propose scoring-dimension weights from performance feedback (not applied)")
+    parser.add_argument("--apply-weights", action="store_true",
+                        help="Apply latest learned scoring weights to clip selection (no-op until confident proposal exists)")
     parser.add_argument("--mode", default="observation_only",
                         choices=["observation_only", "adaptive_mode"],
                         help="Memory influence mode (default: observation_only)")

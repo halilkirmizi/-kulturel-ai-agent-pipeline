@@ -8,7 +8,8 @@
 ## GÜNCEL DURUM — 2026-06-30
 
 **Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
-**Test:** `python tests/run_all.py` → **10/10 suite, 132/132 check PASS** (+learning, +clip_selection: full-text+dedupe+fallback+multi-length).
+**Test:** `python tests/run_all.py` → **11/11 suite, 143/143 check PASS**.
+**Öğrenme döngüsü KAPANDI:** `--apply-weights` öğrenilen ağırlıkları skorlamaya uygular (opt-in, gerçek veri yokken no-op). Tek kalan: gerçek upload+analytics verisi.
 **Klip seçim kalitesi düzeltildi:** LLM artık pencerelerin tam metnini görüyor (önceden kör). `--legacy-select` ile eskiye dönülür. Gerçek A/B yapısal iyileşmeyi gösterdi.
 
 **learning_engine eklendi (SİMÜLASYON):** `--propose-weights` performans verisinden boyut-ağırlığı + feature lift önerir, weights_vN.json yazar, ASLA uygulamaz. Geri besleme döngüsünün "öğrenme" hesabı artık var; tek kalan onu config'e UYGULAMAK (canlı mod, gerçek veri biriktikten sonra).
@@ -90,6 +91,27 @@
 ### Sıradaki (döngüyü kapatmak için son adım)
 1. Gerçek veri biriktir: `--upload` → 1-2 gün → `--fetch-analytics` → `--propose-weights`.
 2. CANLI mod: bir weights_vN proposal'ını ControlArbiter scoring_bias'a bağla (ROADMAP STEP 5, ayrı + dikkatli; influence ≤30%, DAG/AOR/Contract ezilmez).
+
+---
+
+## Session 24 — 2026-06-30: Öğrenme Döngüsü Kapatıldı (STEP 5)
+
+### Yapıldı
+- **learning_engine.load_latest_weights(dir):** en yüksek versiyonlu, low_confidence OLMAYAN proposal'ın dimension_weights'ini döndürür ({} yoksa → uygulama no-op).
+- **clip_scoring._weighted_total(scores, dim_weights):** ağırlık yoksa düz toplam (davranış aynı); varsa `score * weight` (ağırlıklar 0.5–1.5 clamp'li). score_clips'e `dim_weights` param eklendi; score_total bundan hesaplanıyor.
+- **phase1:** `--apply-weights` açıkken latest weights yüklenip score_clips'e geçilir. Güvenilir öneri yoksa eşit ağırlık (no-op). Hata → eşit ağırlık.
+- **config/cli/main:** `--apply-weights` + `PipelineConfig.apply_weights` (default False).
+
+### Disiplin
+- Opt-in, default kapalı. Ağırlıklar sınırlı → skorlamayı yeniden sıralar ama domine etmez. DAG/AOR/Contract'a DOKUNMAZ (sadece LLM-skorlu kliplerin sıralaması). Gerçek veri yoksa otomatik no-op.
+
+### Test
+- `tests/test_apply_weights.py` 11/11 (ağırlıklı toplam, sentetik ağırlıkla sıralama flip, latest-weights versiyon/güven seçimi, config).
+- Tam matris: **11/11 suite, 143/143 check PASS**.
+
+### Döngü artık tam
+download→…→**score (öğrenilen ağırlık)**→render→upload→**video_id+provenance**→**fetch-analytics→performance_score**→**propose-weights**→**apply-weights**→score…
+- **Kalan tek eksik: GERÇEK VERİ.** Birkaç gerçek upload + birikmiş analytics olunca propose confident olur, apply anlamlı çalışır.
 
 ---
 

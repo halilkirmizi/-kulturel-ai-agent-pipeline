@@ -8,7 +8,7 @@
 ## GÜNCEL DURUM — 2026-06-30
 
 **Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
-**Test:** `python tests/run_all.py` → **10/10 suite, 122/122 check PASS** (+learning, +clip_selection +dedupe).
+**Test:** `python tests/run_all.py` → **10/10 suite, 127/127 check PASS** (+learning, +clip_selection: full-text+dedupe+fallback).
 **Klip seçim kalitesi düzeltildi:** LLM artık pencerelerin tam metnini görüyor (önceden kör). `--legacy-select` ile eskiye dönülür. Gerçek A/B yapısal iyileşmeyi gösterdi.
 
 **learning_engine eklendi (SİMÜLASYON):** `--propose-weights` performans verisinden boyut-ağırlığı + feature lift önerir, weights_vN.json yazar, ASLA uygulamaz. Geri besleme döngüsünün "öğrenme" hesabı artık var; tek kalan onu config'e UYGULAMAK (canlı mod, gerçek veri biriktikten sonra).
@@ -50,8 +50,12 @@
 
 ### Ek (aynı oturum): örtüşen klip dedupe
 - `_overlap_ratio` + `_dedupe_overlapping` (clip_scoring.py): seçim sonrası >%50 örtüşen klipler elenir, yüksek skorlu tutulur. Deterministik, legacy_select'te kapalı. Return tipi/sözleşme aynı.
-- Test: test_clip_selection 20/20. Tam matris: **10/10 suite, 122/122 check PASS**.
-- Kalan kalite fikirleri: fallback klip kalitesi, window boyut ayarı.
+- Test: test_clip_selection 20/20.
+
+### Ek (aynı oturum): fallback klip kalitesi
+- `_fallback_window_score` + yeniden yazılan `_fallback_clip`: model hiç klip seçemezse "en uzun segment" yerine aday pencereler arasından **bilgi-yoğun + cümle-ortası başlamayan** en iyi pencereyi seçer (deterministik, TARGET_WIN'e yakın süre tercih). Last-resort açılış span'i korundu.
+- Test: test_clip_selection 25/25. Tam matris: **10/10 suite, 127/127 check PASS**.
+- Kalan kalite fikri: window boyutunu içeriğe göre ayarlama.
 
 ---
 

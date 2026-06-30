@@ -300,34 +300,55 @@ def _dedupe_overlapping(clips: List["ScoredClip"], max_overlap: float = 0.5) -> 
 # ── Fallback ───────────────────────────────────
 
 
+def _fallback_window_score(win: "_Window", segments: list) -> float:
+    """Deterministic quality heuristic for a fallback window (no LLM).
+
+    Rewards information density (word count), penalises windows that open
+    mid-thought, and prefers durations near TARGET_WIN.
+    """
+    start, end = _expand_to_boundaries(win.start, win.end, segments)
+    words = sum(len(s.text.split()) for s in segments
+                if s.start >= start and s.end <= end and s.text.strip())
+    score = float(words)
+    if _opens_mid_thought(win.text):
+        score *= 0.5
+    score -= abs((end - start) - TARGET_WIN) * 0.5
+    return score
+
+
 def _fallback_clip(segments: list) -> Optional[ScoredClip]:
-    """Fallback: return longest valid segment from the video."""
+    """Fallback when the LLM picks nothing: best candidate window by a
+    deterministic density/cleanliness heuristic (not just the longest span)."""
     if not segments:
         return None
 
-    best_start = segments[0].start
-    best_end = segments[-1].end
+    best = None  # (score, start, end)
+    for w in _build_windows(segments):
+        start, end = _expand_to_boundaries(w.start, w.end, segments)
+        ok, _reason = _validate_clip(start, end, segments)
+        if not ok:
+            continue
+        sc = _fallback_window_score(w, segments)
+        if best is None or sc > best[0]:
+            best = (sc, start, end)
 
-    for s in segments:
-        for e in segments[segments.index(s):]:
-            dur = e.end - s.start
-            if MIN_CLIP <= dur <= MAX_CLIP:
-                if dur > best_end - best_start:
-                    best_start = s.start
-                    best_end = e.end
-
-    if best_end - best_start < MIN_CLIP:
-        best_start = segments[0].start
-        best_end = min(segments[0].start + MAX_CLIP, segments[-1].end)
+    if best is not None:
+        _, b_start, b_end = best
+        reason = "Fallback: best window by density"
+    else:
+        # Last resort: a single bounded span from the start.
+        b_start = segments[0].start
+        b_end = min(segments[0].start + MAX_CLIP, segments[-1].end)
+        reason = "Fallback: opening span"
 
     return ScoredClip(
-        start=best_start,
-        end=best_end,
-        duration=best_end - best_start,
+        start=b_start,
+        end=b_end,
+        duration=b_end - b_start,
         hook_text="Highlight",
         intro_script="",
         outro_script="",
-        reason="Fallback: longest valid segment",
+        reason=reason,
         scores={"curiosity": 5, "emotional_relevance": 5, "educational_value": 5, "narrative_completeness": 5},
         score_total=20.0,
     )

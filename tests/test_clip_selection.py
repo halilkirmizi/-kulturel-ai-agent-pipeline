@@ -33,6 +33,7 @@ def check(name, cond, detail=""):
 from analysis.clip_scoring import (
     _opens_mid_thought, _build_window_listing, _Window, CLIP_SYSTEM_PROMPT,
     _overlap_ratio, _dedupe_overlapping, ScoredClip,
+    _fallback_window_score, _fallback_clip, MIN_CLIP, MAX_CLIP,
 )
 
 
@@ -102,8 +103,28 @@ check("disjoint set untouched",
       len(_dedupe_overlapping([_clip(0, 10, 5), _clip(50, 60, 4)])) == 2)
 
 
+# ── fallback quality ────────────────────────────────────────────────────────
+print("\n[TEST 6] fallback quality")
+fsegs = [
+    Seg(0, 6, "Napoleon conquered most of Europe before his downfall in the brutal Russian winter"),
+    Seg(6, 12, "his armies marched across the entire continent winning a long series of decisive battles"),
+    Seg(12, 30, "and so that was basically the end of it"),
+]
+clean_dense = _Window(wid=0, start=0.0, end=12.0,
+                      text=fsegs[0].text + " " + fsegs[1].text)
+midthought_sparse = _Window(wid=1, start=12.0, end=30.0, text=fsegs[2].text)
+check("clean+dense scores above mid-thought+sparse",
+      _fallback_window_score(clean_dense, fsegs) > _fallback_window_score(midthought_sparse, fsegs))
+
+fb = _fallback_clip(fsegs)
+check("fallback returns a clip", fb is not None)
+check("fallback duration valid", fb is not None and MIN_CLIP <= fb.duration <= MAX_CLIP, f"{fb.duration:.1f}")
+check("fallback prefers dense window (starts at 0)", fb is not None and fb.start == 0.0)
+check("empty -> None", _fallback_clip([]) is None)
+
+
 # ── config wiring ───────────────────────────────────────────────────────────
-print("\n[TEST 6] config wiring")
+print("\n[TEST 7] config wiring")
 from core.config import build_config
 check("default rich (legacy_select False)", build_config().legacy_select is False)
 check("override legacy_select", build_config(legacy_select=True).legacy_select is True)

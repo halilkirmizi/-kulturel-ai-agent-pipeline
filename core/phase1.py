@@ -38,6 +38,7 @@ log = get_logger(__name__)
 
 # ── Phase 1 Feature Declarations ──────────────────────────────────
 registry.declare("download_video", "core", "yt-dlp video download")
+registry.declare("trim_silence", "optional", "Pre-transcription silence trimming")
 registry.declare("transcribe", "core", "Whisper GPU/CPU transcription")
 registry.declare("extract_topics", "core", "Keyword extraction from transcript")
 registry.declare("knowledge_graph", "optional", "Obsidian graph enrichment")
@@ -132,6 +133,40 @@ def run_phase1(
     except Exception as exc:
         registry.fail("download_video")
         raise PipelineError(f"Download failed: {exc}") from exc
+
+    # ── Optional: trim silence BEFORE transcription so captions stay in sync ──
+    if getattr(config, "trim_silence", False):
+        try:
+            from editing.silence import (
+                build_silencedetect_command, parse_silencedetect,
+                compute_keep_segments, kept_fraction, build_trim_command,
+            )
+            from editing.ffmpeg_builder import run_silencedetect
+
+            total = probe_duration(video_path)
+            det_cmd = build_silencedetect_command(
+                video_path, config.silence_noise_db, config.silence_min_dur)
+            stderr = run_silencedetect(det_cmd)
+            silences = parse_silencedetect(stderr)
+            keeps = compute_keep_segments(silences, total)
+            frac = kept_fraction(keeps, total)
+            if keeps and frac < 0.97:
+                trimmed = config.temp_path() / f"trimmed_{os.urandom(4).hex()}.mp4"
+                cmd = build_trim_command(video_path, keeps, trimmed, config)
+                validate_ffmpeg_command(cmd, "trim_silence")
+                if execute(cmd) == 0 and trimmed.exists() and probe_duration(trimmed) > 0:
+                    _assert_valid_video(trimmed)
+                    AOR.register_write("trimmed_video", trimmed, __name__)
+                    log.info("  [silence] trimmed %.0f%% silence (%.1fs -> %.1fs)",
+                             (1 - frac) * 100, total, probe_duration(trimmed))
+                    video_path = trimmed
+                else:
+                    log.warning("  [silence] trim render failed — using original")
+            else:
+                log.info("  [silence] nothing worth trimming (kept %.0f%%)", frac * 100)
+            registry.use("trim_silence")
+        except Exception as exc:
+            log.warning("  [silence] skipped (%s) — using original media", exc)
 
     try:
         log.info("[2/5] Transcribing with Whisper (GPU)...")

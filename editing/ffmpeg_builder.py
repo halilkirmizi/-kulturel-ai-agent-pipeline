@@ -77,6 +77,18 @@ def probe_file(path: Path) -> Dict[str, Any]:
         return {}
 
 
+def run_silencedetect(cmd: List[str], timeout: Optional[float] = 600) -> str:
+    """Run a silencedetect command and return its stderr (where ffmpeg logs).
+
+    Execution stays inside this gateway; parsing lives in editing/silence.py.
+    Returns empty string on failure (caller falls back to untrimmed media).
+    """
+    try:
+        return _run_ffmpeg_capture(cmd, timeout=timeout).stderr or ""
+    except Exception:
+        return ""
+
+
 _NVENC_CACHE: Optional[bool] = None
 
 

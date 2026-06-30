@@ -23,6 +23,7 @@
 | **13** | **2026-06-30** | **Stabilizasyon: legacy dış git deposu arşivlendi, çalışma ağacı temizlendi** | **✅** |
 | **14** | **2026-06-30** | **Workflow gap analizi (Opus Clip/OSS kıyas) + #1 yüz takipli reframe eklendi** | **✅** |
 | **15** | **2026-06-30** | **#8 WORKFLOW.md güncellendi + #3a karaoke altyazı eklendi** | **✅** |
+| **16** | **2026-06-30** | **#3b sessizlik-kesme (transkript-öncesi, senkron-güvenli)** | **✅** |
 
 ---
 
@@ -252,3 +253,28 @@ Tespit edilen eksikler (öncelik sırasıyla):
 ### Next Steps
 1. Gerçek video E2E: `--auto-reframe --karaoke` görsel kontrol
 2. #3b sessizlik-kesme (transkript-öncesi tasarımıyla) VEYA #2 Analytics feedback
+
+---
+
+## Session 16 — 2026-06-30: Sessizlik-Kesme (#3b)
+
+### Tasarım (senkron-güvenli)
+- Sessizlik **transkriptten ÖNCE**, Phase 1'de indirme sonrası kaynak medyadan kesilir. Whisper kesilmiş medyada çalıştığı için tüm downstream timestamp'ler (scoring/crop/caption) doğru kurulur → **altyazı desync YOK**. (Phase 2 klibi yeniden transkript etmiyor; çözüm bu yüzden Phase 1'de.)
+
+### Kod
+- **Yeni `editing/silence.py` (saf):** `build_silencedetect_command`, `parse_silencedetect`, `compute_keep_segments` (sessizlikleri pad ile küçültüp konuşma aralıklarına çevirir), `kept_fraction`, `build_trim_command` (tek-pass select/concat + setpts/asetpts, A/V senkron).
+- **ffmpeg_builder:** `run_silencedetect()` — stderr yakalayan tek subprocess (gateway kuralı korundu).
+- **phase1:** indirme→[sessizlik kes]→transkript. Hata/boş/az-fayda (kept ≥ %97) → orijinalle devam. AOR `trimmed_video` write + `_assert_valid_video`.
+- **Opt-in:** `--trim-silence` + `PipelineConfig.trim_silence` (default False). Eşikler config'ten (`silence.noise_db`/`min_dur`).
+
+### Test
+- `tests/test_silence.py` 16/16 PASS (parse, keep-segment matematiği, pad davranışı, komut üretimi).
+- Regresyon: refactor 10/10, reframe 10/10, karaoke 9/9 — hepsi PASS.
+
+### Bilinen kısıt
+- Gerçek video E2E yapılmadı (subprocess yolu); saf mantık tam test edildi. `--trim-silence` ile bir gerçek run'da süre/senkron gözle doğrulanmalı.
+- Uzun videoda tüm kaynağı yeniden encode eder (yavaş olabilir); opt-in olduğu için kabul.
+
+### Next Steps
+1. Gerçek video E2E: `--auto-reframe --karaoke --trim-silence` birlikte görsel kontrol
+2. #2 Analytics feedback (öğrenen sistemin zemini) — sıradaki büyük gap

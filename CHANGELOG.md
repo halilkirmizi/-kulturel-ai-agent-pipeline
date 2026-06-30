@@ -11,3 +11,4 @@
 2026-06-21: Fix: youtube OTP'siz de kullanılacaksa Phase 2 tamamlanmalı
 2026-06-30: Add: subject-aware reframe (analysis/reframe.py) — yüz takipli 9:16 crop, opt-in `--auto-reframe`, default kapalı, yüz bulunmazsa merkez-crop'a düşer (opencv-python-headless)
 2026-06-30: Add: karaoke captions — opt-in `--karaoke`, per-word `\k` ASS highlight (sung=sarı, upcoming=beyaz), default kapalı, statik mod bit-bit aynı (captions.py)
+2026-06-30: Add: silence trim — opt-in `--trim-silence`, transkript-ÖNCESİ kaynak medyadan sessizlik keser (altyazı senkronda kalır), default kapalı, hata/boşta orijinalle devam (editing/silence.py)

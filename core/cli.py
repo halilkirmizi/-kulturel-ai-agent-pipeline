@@ -30,6 +30,8 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
     parser.add_argument("--no-captions", action="store_true", help="Skip caption overlay")
     parser.add_argument("--karaoke", action="store_true",
                         help="Per-word karaoke caption highlighting (animated)")
+    parser.add_argument("--trim-silence", action="store_true",
+                        help="Cut silent gaps from source before transcription (tighter pacing)")
     parser.add_argument("--translate", action="store_true", help="Translate captions (es->en)")
     parser.add_argument("--intro", help="Path to intro audio (default: search clip dir)")
     parser.add_argument("--gpu", action="store_true", default=True, help="Enable GPU acceleration")

@@ -117,6 +117,11 @@ class PipelineConfig:
     # Reframe (subject-aware crop). Opt-in; default keeps centre crop.
     auto_reframe: bool = False
 
+    # Silence trim (pre-transcription, keeps captions in sync). Opt-in.
+    trim_silence: bool = False
+    silence_noise_db: str = "-30dB"
+    silence_min_dur: float = 0.5
+
     # Format
     format_name: str = "format1"
 
@@ -200,6 +205,9 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         # Content
         content_type=overrides.get("content_type", "general"),
         auto_reframe=overrides.get("auto_reframe", False),
+        trim_silence=overrides.get("trim_silence", False),
+        silence_noise_db=str(_g("silence", "noise_db", "-30dB")),
+        silence_min_dur=float(_g("silence", "min_dur", 0.5)),
 
         # Format
         format_name=format_name,

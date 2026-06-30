@@ -9,3 +9,4 @@
 2026-06-21: Add: StepTracker UUID isolation (execution_trace_<uuid>.json) (core/steptracker.py:58-63)
 2026-06-21: Test: cross-run contamination = NONE (3 consecutive transcribe failure runs, 0 leakage)
 2026-06-21: Fix: youtube OTP'siz de kullanılacaksa Phase 2 tamamlanmalı
+2026-06-30: Add: subject-aware reframe (analysis/reframe.py) — yüz takipli 9:16 crop, opt-in `--auto-reframe`, default kapalı, yüz bulunmazsa merkez-crop'a düşer (opencv-python-headless)

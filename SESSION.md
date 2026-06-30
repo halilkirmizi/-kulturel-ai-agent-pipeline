@@ -21,6 +21,7 @@
 | **11** | **2026-06-26** | **Pipeline refactor: main.py → 4 modül** | **✅** |
 | **12** | **2026-06-26** | **Feature registry modüllere dağıtıldı, CLAUDE.md güncellendi** | **✅** |
 | **13** | **2026-06-30** | **Stabilizasyon: legacy dış git deposu arşivlendi, çalışma ağacı temizlendi** | **✅** |
+| **14** | **2026-06-30** | **Workflow gap analizi (Opus Clip/OSS kıyas) + #1 yüz takipli reframe eklendi** | **✅** |
 
 ---
 
@@ -199,3 +200,33 @@ pipeline/
 ### Next Steps (devam, Session 12'den taşındı)
 1. Memory write-back test (adaptive_mode) — hâlâ test edilmemiş en büyük risk
 2. `_archive`'daki legacy git'i birkaç hafta sorun çıkmazsa tamamen sil
+
+---
+
+## Session 14 — 2026-06-30: Workflow Gap Analizi + Yüz Takipli Reframe
+
+### Gap analizi (Opus Clip + SamurAIGPT/OpenShorts/ShortGPT kıyası)
+Tespit edilen eksikler (öncelik sırasıyla):
+1. **Yüz/konu takipli crop** (statik merkez-crop konuşanı kesiyordu) ← BU SESSION YAPILDI
+2. YouTube Analytics geri beslemesi yok → self-learning katmanının zemini eksik
+3. Animasyonlu altyazı (düz drawtext) + sessizlik/dolgu kelime kesme yok
+4. Sadece YouTube + anında yükleme (scheduler/çoklu platform yok)
+5. SEO başlık/açıklama/hashtag otomasyonu zayıf; b-roll yok
+6. `WORKFLOW.md` eski dosya yapısını anlatıyor (güncellenmeli)
+
+### Yapıldı: #1 Subject-aware reframe
+- **Yeni modül:** `analysis/reframe.py`
+  - `compute_crop_x()` — saf geometri (test edilebilir)
+  - `detect_crop_x()` — OpenCV Haar cascade, klipten N kare örnekler, dominant yüzün medyan x'ini bulur. cv2 yok / yüz yok / okuma hatası → `None` (merkez-crop'a düşer). Pipeline'ı asla bozmaz.
+- **render_core.build_crop_command** — opsiyonel `crop_x` parametresi aldı (None = eski merkez davranış, bit-bit aynı). render_core saf kaldı (video okumaz).
+- **Opt-in:** `--auto-reframe` CLI flag, `PipelineConfig.auto_reframe` (default False). Football content-type'ı kendi framing'ini korur.
+- **Bağımlılık:** `opencv-python-headless>=4.8.0` (requirements.txt + kuruldu).
+- **Test:** `tests/test_reframe.py` 10/10 PASS. Regresyon: `tests/test_refactor.py` 10/10 PASS.
+
+### Bilinen kısıt
+- Gerçek videoyla uçtan uca (E2E) çalıştırma yapılmadı — sadece birim test + komut doğrulama. Bir sonraki gerçek run'da `--auto-reframe` ile görsel doğrulama yapılmalı.
+- MVP statik per-clip offset (klip boyunca tek x). Opus Clip tarzı yumuşak hareket-takibi (dynamic pan) bir sonraki iterasyon.
+
+### Next Steps
+1. `--auto-reframe` ile gerçek video E2E + görsel kontrol
+2. Sıradaki gap: #2 (Analytics feedback) veya #3 (animasyonlu altyazı)

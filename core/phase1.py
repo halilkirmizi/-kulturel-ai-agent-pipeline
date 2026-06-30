@@ -29,6 +29,7 @@ from analysis.transcription import transcribe, format_transcript
 from analysis.topic_detection import extract_topics
 from analysis.clip_scoring import score_clips
 from editing.render_core import build_crop_command
+from analysis.reframe import detect_crop_x
 from editing.ffmpeg_builder import execute, probe_duration, probe_file
 
 
@@ -218,7 +219,14 @@ def run_phase1(
         out_dir.mkdir(parents=True, exist_ok=True)
 
         cropped_tmp = out_dir / "clip.tmp.mp4"
-        cmd = build_crop_command(video_path, sc.start, sc.end, cropped_tmp, config)
+        crop_x = None
+        if getattr(config, "auto_reframe", False) and config.content_type != "football":
+            crop_x = detect_crop_x(video_path, sc.start, sc.end)
+            if crop_x is not None:
+                log.info("  [reframe] %s subject-centred crop_x=%d", clip_slug, crop_x)
+            else:
+                log.info("  [reframe] %s no face found, centre crop", clip_slug)
+        cmd = build_crop_command(video_path, sc.start, sc.end, cropped_tmp, config, crop_x=crop_x)
         validate_ffmpeg_command(cmd, "crop")
         execute(cmd)
         _assert_valid_video(cropped_tmp)

@@ -86,6 +86,7 @@ def main(argv=None) -> None:
     config = build_config(
         format_name=args.format,
         content_type=args.content_type,
+        auto_reframe=args.auto_reframe,
         gpu=args.gpu,
         upload=args.upload,
         schedule_days=args.schedule,

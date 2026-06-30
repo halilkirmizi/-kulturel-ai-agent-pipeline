@@ -111,6 +111,9 @@ class PipelineConfig:
     # Content
     content_type: str = "general"
 
+    # Reframe (subject-aware crop). Opt-in; default keeps centre crop.
+    auto_reframe: bool = False
+
     # Format
     format_name: str = "format1"
 
@@ -193,6 +196,7 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         llm_max_chars=int(os.getenv("LLM_MAX_CHARS", "30000")),
         # Content
         content_type=overrides.get("content_type", "general"),
+        auto_reframe=overrides.get("auto_reframe", False),
 
         # Format
         format_name=format_name,

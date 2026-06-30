@@ -21,8 +21,16 @@ def build_crop_command(
     end: float,
     output_path: Path,
     config: PipelineConfig,
+    crop_x: int | None = None,
 ) -> list:
     """Build FFmpeg command to crop a segment to 9:16 vertical (1080x1920).
+
+    Args:
+        crop_x: optional horizontal pixel offset for the crop window. When
+            ``None`` the window is centred (the original behaviour). When an
+            integer is given (from ``analysis.reframe.detect_crop_x``) the
+            window is shifted to keep the subject in frame. Only honoured for
+            the general content type; ``football`` keeps its own framing.
 
     Returns:
         Command list for ffmpeg_builder.execute().
@@ -39,7 +47,11 @@ def build_crop_command(
     else:
         # Crop with extra height to include hardcoded subtitles at bottom
         # Use exact 9:16 ratio, scale handles the rest
-        vf_parts.append("crop=ih*9/16:ih:(iw-ih*9/16)/2:0")
+        if crop_x is None:
+            x_expr = "(iw-ih*9/16)/2"  # centred (default)
+        else:
+            x_expr = str(int(crop_x))  # subject-centred (auto-reframe)
+        vf_parts.append(f"crop=ih*9/16:ih:{x_expr}:0")
         vf_parts.append(f"scale=1080:1920:flags={clip_cfg.resize_flags}")
         vf_parts.append("setsar=1")
 

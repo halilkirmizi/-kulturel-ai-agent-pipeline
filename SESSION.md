@@ -24,6 +24,7 @@
 | **14** | **2026-06-30** | **Workflow gap analizi (Opus Clip/OSS kıyas) + #1 yüz takipli reframe eklendi** | **✅** |
 | **15** | **2026-06-30** | **#8 WORKFLOW.md güncellendi + #3a karaoke altyazı eklendi** | **✅** |
 | **16** | **2026-06-30** | **#3b sessizlik-kesme (transkript-öncesi, senkron-güvenli)** | **✅** |
+| **17** | **2026-06-30** | **Gerçek-yürütme entegrasyon testi (ffmpeg E2E, 3 özellik doğrulandı)** | **✅** |
 
 ---
 
@@ -278,3 +279,29 @@ Tespit edilen eksikler (öncelik sırasıyla):
 ### Next Steps
 1. Gerçek video E2E: `--auto-reframe --karaoke --trim-silence` birlikte görsel kontrol
 2. #2 Analytics feedback (öğrenen sistemin zemini) — sıradaki büyük gap
+
+---
+
+## Session 17 — 2026-06-30: Gerçek-Yürütme Entegrasyon Testi
+
+### Ne yapıldı
+- `tests/test_integration_ffmpeg.py`: sentetik 6sn fixture üretir (ton/SESSİZ/ton, 1280x720) ve **gerçek ffmpeg/cv2** ile yeni 3 özelliği uçtan uca çalıştırır. YouTube/Groq/GPU gerektirmez.
+- Sonuç **8/8 PASS**:
+  - Sessizlik: kurulan boşluk `[1.999, 4.000]` tespit edildi, trim 6.0sn → 4.11sn ✅
+  - Crop: `crop_x`'li + varsayılan → çıktı 1080x1920 (cv2 ile ölçüldü) ✅
+  - Karaoke: ASS altyazı gerçekten gömüldü, 3.00sn çıktı ✅
+  - Reframe: cv2 yolu çalıştı, yüz yok → güvenli None ✅
+- **"Subprocess yolu E2E test edilmedi" uyarısı kapandı** (rendering tarafı için).
+
+### fixture notu (gotcha)
+- lavfi `aevalsrc` ifadesindeki virgüller ffmpeg'de filtergraph ayırıcısı; Python argv'de `\,` ile escape şart (`lt(mod(t\,4)\,2)`).
+
+### Hâlâ test edilmeyen (kasıtlı)
+- yt-dlp indirme, Whisper doğruluğu, Groq scoring, YouTube upload — gerçek URL + .env gerektirir. Bunlar rendering değil, ayrı entegrasyonlar.
+
+### Test matrisi (tümü PASS)
+refactor 10/10 · reframe 10/10 · karaoke 9/9 · silence 16/16 · integration 8/8
+
+### Next Steps
+1. Tam gerçek video E2E (kullanıcı URL + .env ile tetikler)
+2. #2 Analytics feedback — sıradaki büyük gap

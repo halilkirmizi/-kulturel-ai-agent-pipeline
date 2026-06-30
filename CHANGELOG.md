@@ -12,3 +12,5 @@
 2026-06-30: Add: subject-aware reframe (analysis/reframe.py) — yüz takipli 9:16 crop, opt-in `--auto-reframe`, default kapalı, yüz bulunmazsa merkez-crop'a düşer (opencv-python-headless)
 2026-06-30: Add: karaoke captions — opt-in `--karaoke`, per-word `\k` ASS highlight (sung=sarı, upcoming=beyaz), default kapalı, statik mod bit-bit aynı (captions.py)
 2026-06-30: Add: silence trim — opt-in `--trim-silence`, transkript-ÖNCESİ kaynak medyadan sessizlik keser (altyazı senkronda kalır), default kapalı, hata/boşta orijinalle devam (editing/silence.py)
+2026-06-30: Add: performance feedback (#2) — upload video_id artık saklanıyor (state + performance_store.json), provenance kaydı, `--fetch-analytics` ile YouTube stats çekip deterministik performance_score (core/performance.py, analysis/youtube_stats.py)
+2026-06-30: Change: upload_video/upload_with_retry artık bool yerine video_id (Optional[str]) döner — truthiness korundu, geriye uyumlu

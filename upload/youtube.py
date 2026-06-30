@@ -157,7 +157,7 @@ def upload_video(
     tags: Optional[list] = None,
     privacy_status: str = "unlisted",
     schedule_days: int = -1,
-) -> bool:
+) -> Optional[str]:
     """Upload a video to YouTube.
 
     Args:
@@ -169,23 +169,24 @@ def upload_video(
         schedule_days: -1 = immediate, 0 = next business day, N = N days later.
 
     Returns:
-        True on success.
+        The YouTube video_id (truthy) on success, else None. (A non-empty
+        string is truthy, so existing ``if upload_video(...)`` checks still work.)
     """
     from googleapiclient.http import MediaFileUpload
 
     video_path = Path(video_path)
     if not video_path.exists():
         log.error("Video not found: %s", video_path)
-        return False
+        return None
 
     # Duplicate check
     sig = _get_video_signature(video_path)
     if _check_duplicate(sig):
-        return False
+        return None
 
     # Quota check
     if not _check_quota():
-        return False
+        return None
 
     log.info("Uploading %s (%d MB)", video_path.name, video_path.stat().st_size // (1024 * 1024))
 
@@ -193,7 +194,7 @@ def upload_video(
         youtube = _get_authenticated_service()
     except Exception as exc:
         log.error("Authentication failed: %s", exc)
-        return False
+        return None
 
     body = {
         "snippet": {
@@ -227,10 +228,10 @@ def upload_video(
         log.info("Upload successful! Video ID: %s", video_id)
         _mark_uploaded(sig)
         _increment_quota()
-        return True
+        return video_id
     except Exception as exc:
         log.error("Upload failed: %s", exc)
-        return False
+        return None
 
 
 def upload_with_retry(
@@ -239,16 +240,17 @@ def upload_with_retry(
     description: str = "",
     max_retries: int = 3,
     **kwargs,
-) -> bool:
-    """Upload with exponential backoff retry."""
+) -> Optional[str]:
+    """Upload with exponential backoff retry. Returns video_id or None."""
     import time
 
     for attempt in range(max_retries):
-        if upload_video(video_path, title=title, description=description, **kwargs):
-            return True
+        vid = upload_video(video_path, title=title, description=description, **kwargs)
+        if vid:
+            return vid
         if attempt < max_retries - 1:
             wait = 2 ** (attempt + 1)
             log.warning("Retrying upload in %ds (attempt %d/%d)", wait, attempt + 1, max_retries)
             time.sleep(wait)
     log.error("Upload failed after %d retries", max_retries)
-    return False
+    return None

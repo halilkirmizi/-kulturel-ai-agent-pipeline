@@ -25,6 +25,7 @@
 | **15** | **2026-06-30** | **#8 WORKFLOW.md güncellendi + #3a karaoke altyazı eklendi** | **✅** |
 | **16** | **2026-06-30** | **#3b sessizlik-kesme (transkript-öncesi, senkron-güvenli)** | **✅** |
 | **17** | **2026-06-30** | **Gerçek-yürütme entegrasyon testi (ffmpeg E2E, 3 özellik doğrulandı)** | **✅** |
+| **18** | **2026-06-30** | **#2 Performans geri besleme katmanı (video_id + analytics + score)** | **✅** |
 
 ---
 
@@ -305,3 +306,30 @@ refactor 10/10 · reframe 10/10 · karaoke 9/9 · silence 16/16 · integration 8
 ### Next Steps
 1. Tam gerçek video E2E (kullanıcı URL + .env ile tetikler)
 2. #2 Analytics feedback — sıradaki büyük gap
+
+---
+
+## Session 18 — 2026-06-30: #2 Performans Geri Besleme Katmanı
+
+### Sorun
+- `upload_video` YouTube'dan dönen `video_id`'yi alıp atıyordu → hangi videonun nasıl performans gösterdiği geri bağlanamıyordu. Öğrenen sistemin **zemini** yoktu.
+
+### Yapıldı (zemin + analytics, learning_engine HENÜZ değil)
+- **upload zinciri:** `upload_video`/`upload_with_retry` artık `bool` yerine `Optional[str]` (video_id) döner. Truthiness korundu (`if vid:`), geriye uyumlu. `core/upload.py` başarılı upload'ta `state["youtube_video_id"]` yazar + provenance kaydı oluşturur.
+- **core/performance.py (yeni, saf):** `compute_performance_score(stats)` (deterministik: log-ölçekli reach %60 + engagement %40, 0..1 clamp), `build_record(video_id, state, features)` (hook + LLM skor + 4-boyut + hangi flag'ler açıktı), `PerformanceStore` (video_id keyed, atomic save, pending/attach/summary).
+- **analysis/youtube_stats.py (yeni, ince):** `fetch_stats(video_ids, service=None)` Data API `videos.list(part=statistics)` → views/likes/comments. Kimlik yok/hata → `{}` (graceful). `service` enjekte edilebilir (test için). `parse_stats_response` saf.
+- **CLI `--fetch-analytics`:** performance_store'daki pending video'ların stats'ını çeker, score hesaplar, kaydeder, özet basar (erken-çıkış komut).
+- **.gitignore:** `performance_store.json` (yerel veri).
+
+### Test
+- `tests/test_performance.py` 19/19 PASS (scoring monotonluk/clamp, store round-trip, mock servisle stats parse + graceful error).
+- Regresyon: refactor 10/10, reframe 10/10, karaoke 9/9, silence 16/16, integration 8/8 — hepsi PASS.
+
+### Bilinen kısıt / sonraki adım
+- Gerçek API çağrısı kimlik gerektirdiği için mock'landı; canlı stats için kullanıcı `--upload` ile video yükleyip 1-2 gün sonra `--fetch-analytics` çalıştırmalı.
+- **learning_engine HENÜZ yok:** performance_score üretiliyor ama henüz weight güncellemesine bağlı değil. ROADMAP STEP 3/5 = bu skoru config'e geri besleyen learning loop. Sıradaki büyük iş.
+- YouTube **retention** (izlenme süresi) için ayrı `yt-analytics.readonly` OAuth scope gerekir; şu an sadece Data API statistics (views/likes/comments).
+
+### Next Steps
+1. learning_engine: performance_score → weight ayarı (ROADMAP STEP 3 simulation-first)
+2. Gerçek upload + `--fetch-analytics` canlı doğrulama

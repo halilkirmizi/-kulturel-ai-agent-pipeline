@@ -13,6 +13,7 @@ logs/
 downloads/
 shorts_output/
 memory_store.json
+performance_store.json
 upload/.upload_quota.json
 upload/.upload_log.json
 

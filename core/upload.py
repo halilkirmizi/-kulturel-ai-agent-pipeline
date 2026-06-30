@@ -27,6 +27,30 @@ class PipelineError(Exception):
     """Base exception for pipeline stage failures."""
 
 
+# Performance store lives at pipeline root (gitignored, like memory_store.json).
+PERF_STORE = Path(__file__).resolve().parent.parent / "performance_store.json"
+
+
+def _record_provenance(video_id: str, state: dict, config: PipelineConfig) -> None:
+    """Record what produced this upload, so analytics can be tied back later.
+
+    Best-effort: never breaks the upload on failure.
+    """
+    try:
+        from core.performance import PerformanceStore, build_record
+        features = {
+            "auto_reframe": getattr(config, "auto_reframe", False),
+            "karaoke": config.captions.karaoke,
+            "trim_silence": getattr(config, "trim_silence", False),
+        }
+        store = PerformanceStore(PERF_STORE)
+        store.upsert(build_record(video_id, state, features))
+        store.save()
+        log.info("  [perf] provenance recorded for %s", video_id)
+    except Exception as exc:
+        log.warning("  [perf] provenance record failed: %s", exc)
+
+
 def _assert_valid_video(path: Path) -> None:
     """Validate video file via existence, size, ffmpeg probe."""
     from editing.ffmpeg_builder import probe_duration, probe_file
@@ -83,18 +107,20 @@ def run_upload(final_path: Path, config: PipelineConfig) -> None:
     write_state(state_path, state)
 
     try:
-        ok = upload_with_retry(
+        video_id = upload_with_retry(
             str(final_path),
             title=title,
             description=description,
             privacy_status="unlisted" if config.schedule_days < 0 else "private",
             schedule_days=config.schedule_days,
         )
-        if ok:
+        if video_id:
             log.info("  [OK] Upload complete")
             state["pipeline_stage"] = "uploaded"
+            state["youtube_video_id"] = video_id
             write_state(state_path, state)
             registry.use("upload")
+            _record_provenance(video_id, state, config)
         else:
             log.warning("  [FAIL] Upload failed — pipeline continues")
             state["pipeline_stage"] = "upload_failed"

@@ -113,6 +113,26 @@ def main(argv=None) -> None:
         removed = mw.store.compact()
         print(f"Memory compact: {removed} entries removed")
         return
+    if args.fetch_analytics:
+        from core.performance import PerformanceStore
+        from core.upload import PERF_STORE
+        from analysis.youtube_stats import fetch_stats
+        store = PerformanceStore(PERF_STORE)
+        pending = store.pending_ids()
+        print(f"Performance store: {store.summary()}")
+        if not pending:
+            print("No pending videos to fetch.")
+            return
+        print(f"Fetching YouTube stats for {len(pending)} video(s)...")
+        stats = fetch_stats(pending)
+        if not stats:
+            print("No stats returned (missing credentials or API error).")
+            return
+        for vid, s in stats.items():
+            store.attach_stats(vid, s)
+        store.save()
+        print(f"Updated. {store.summary()}")
+        return
 
     # Memory dry-run flag — passed to _run_memory_writer after pipeline
     _memory_dry_run = args.memory_dry_run

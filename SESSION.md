@@ -26,6 +26,7 @@
 | **16** | **2026-06-30** | **#3b sessizlik-kesme (transkript-öncesi, senkron-güvenli)** | **✅** |
 | **17** | **2026-06-30** | **Gerçek-yürütme entegrasyon testi (ffmpeg E2E, 3 özellik doğrulandı)** | **✅** |
 | **18** | **2026-06-30** | **#2 Performans geri besleme katmanı (video_id + analytics + score)** | **✅** |
+| **19** | **2026-06-30** | **Canlı render testi (karaoke) + Windows rename->replace fix + test runner** | **✅** |
 
 ---
 
@@ -333,3 +334,30 @@ refactor 10/10 · reframe 10/10 · karaoke 9/9 · silence 16/16 · integration 8
 ### Next Steps
 1. learning_engine: performance_score → weight ayarı (ROADMAP STEP 3 simulation-first)
 2. Gerçek upload + `--fetch-analytics` canlı doğrulama
+
+---
+
+## Session 19 — 2026-06-30: Canlı Render Testi + rename->replace Fix + Test Runner
+
+### Test runner (kullanıcı kuralı)
+- Kullanıcı: "her feature'dan sonra büyük çaplı test yap." → `tests/run_all.py` eklendi (tüm test_*.py suite'lerini koşar, konsolide özet). Kural hafızaya da yazıldı.
+
+### Canlı render testi (karaoke)
+- Mevcut gerçek bir klip (`short_20260626_203058/clip_1`) kopyalanıp Phase 2 `--resume --karaoke --no-gpu` ile çalıştırıldı (URL/Groq/upload gerekmedi).
+- Sonuç: final.mp4 1080x1920 18.69s, captions.ass'te 50 `\k` etiketi, stil sarı/beyaz → karaoke gerçekten render edildi. ✅
+
+### Kullanıcı geri bildirimi (ÖNEMLİ ürün notu)
+- Kaynak videoda ZATEN gömülü (hardcoded) altyazı varsa, bizim ASS altyazı katmanımız ÇİFT altyazı yaratıyor (bizimki üstte, gömülü altta) → kötü görünüyor.
+- Bu video için `--no-captions` ile yeniden render edildi → tek altyazı (gömülü). Kullanıcı onayladı.
+- **İleride değerlendir:** kaynakta gömülü altyazı tespiti veya format/source başına "captions kapalı" varsayılanı. Şimdilik manuel `--no-captions`.
+
+### Bug fix: Windows rename -> replace
+- `final.tmp.mp4 -> final.mp4` yeniden render'da WinError 183 ("dosya zaten var"). Windows `Path.rename` üzerine yazmaz; `Path.replace` yazar.
+- Düzeltildi: `core/phase1.py` (clip.mp4), `core/phase2.py` (final.mp4). İlk run'da fark yok; yeniden render artık çalışıyor.
+
+### Test (kural gereği tam matris)
+- `python tests/run_all.py` → 6/6 suite, 72/72 check PASS.
+
+### Next Steps
+1. learning_engine (performance_score → weight, simulation-first)
+2. Gerçek YouTube URL ile Phase 1 E2E (`--auto-reframe --trim-silence`)

@@ -14,3 +14,4 @@
 2026-06-30: Add: silence trim — opt-in `--trim-silence`, transkript-ÖNCESİ kaynak medyadan sessizlik keser (altyazı senkronda kalır), default kapalı, hata/boşta orijinalle devam (editing/silence.py)
 2026-06-30: Add: performance feedback (#2) — upload video_id artık saklanıyor (state + performance_store.json), provenance kaydı, `--fetch-analytics` ile YouTube stats çekip deterministik performance_score (core/performance.py, analysis/youtube_stats.py)
 2026-06-30: Change: upload_video/upload_with_retry artık bool yerine video_id (Optional[str]) döner — truthiness korundu, geriye uyumlu
+2026-06-30: Fix: Path.rename -> Path.replace (phase1 clip.mp4, phase2 final.mp4) — Windows'ta yeniden render'da "dosya zaten var" hatası (rename üzerine yazmıyor, replace yazıyor)

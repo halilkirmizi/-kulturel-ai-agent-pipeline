@@ -203,7 +203,7 @@ def run_phase2(
         validate_ffmpeg_command(cmd, "compose")
         execute(cmd)
         _assert_valid_video(final_tmp)
-        final_tmp.rename(clip_dir / "final.mp4")
+        final_tmp.replace(clip_dir / "final.mp4")  # replace: overwrites on re-run (Windows rename does not)
         final_path = clip_dir / "final.mp4"
         AOR.register_write("final_video", final_path, __name__)
         if config.gpu_enabled:

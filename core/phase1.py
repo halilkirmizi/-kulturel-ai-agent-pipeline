@@ -265,7 +265,7 @@ def run_phase1(
         validate_ffmpeg_command(cmd, "crop")
         execute(cmd)
         _assert_valid_video(cropped_tmp)
-        cropped_tmp.rename(out_dir / "clip.mp4")
+        cropped_tmp.replace(out_dir / "clip.mp4")  # replace: overwrites on re-run (Windows rename does not)
         cropped = out_dir / "clip.mp4"
         AOR.register_write("cropped_clip", cropped, __name__)
         if config.gpu_enabled:

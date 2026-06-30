@@ -26,6 +26,9 @@ class CaptionConfig:
     box_color: str = "black@0.4"
     shadow_color: str = "black"
     font: str = "C:/Windows/Fonts/impact.ttf"
+    # Karaoke (per-word highlight). Opt-in; default keeps static captions.
+    karaoke: bool = False
+    highlight_color: str = "&H0000FFFF"  # ASS BBGGRR — yellow
 
 
 @dataclass(frozen=True)
@@ -248,6 +251,8 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
             box_color=str(cap_raw.get("box_color", "black@0.4")),
             shadow_color=str(cap_raw.get("shadow_color", "black")),
             font=str(cap_raw.get("font", "C:/Windows/Fonts/impact.ttf")),
+            karaoke=bool(overrides.get("karaoke", cap_raw.get("karaoke", False))),
+            highlight_color=str(cap_raw.get("highlight_color", "&H0000FFFF")),
         ),
         gpu_enabled=overrides.get("gpu", os.getenv("USE_GPU", "1") == "1"),
         whisper=WhisperConfig(

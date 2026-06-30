@@ -158,7 +158,9 @@ def run_phase2(
             ass_path = clip_dir / "captions.ass"
             write_ass(segments, ass_path, clip_dur, 0.0,
                       fontsize=config.captions.fontsize,
-                      margin_bottom=config.captions.margin_bottom)
+                      margin_bottom=config.captions.margin_bottom,
+                      karaoke=config.captions.karaoke,
+                      highlight_color=config.captions.highlight_color)
 
             captioned = config.temp_path() / f"captioned_{os.urandom(4).hex()}.mp4"
             ass_escaped = ass_path.as_posix().replace(":", "\\:")

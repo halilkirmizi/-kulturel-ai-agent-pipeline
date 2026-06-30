@@ -22,6 +22,7 @@
 | **12** | **2026-06-26** | **Feature registry modüllere dağıtıldı, CLAUDE.md güncellendi** | **✅** |
 | **13** | **2026-06-30** | **Stabilizasyon: legacy dış git deposu arşivlendi, çalışma ağacı temizlendi** | **✅** |
 | **14** | **2026-06-30** | **Workflow gap analizi (Opus Clip/OSS kıyas) + #1 yüz takipli reframe eklendi** | **✅** |
+| **15** | **2026-06-30** | **#8 WORKFLOW.md güncellendi + #3a karaoke altyazı eklendi** | **✅** |
 
 ---
 
@@ -230,3 +231,24 @@ Tespit edilen eksikler (öncelik sırasıyla):
 ### Next Steps
 1. `--auto-reframe` ile gerçek video E2E + görsel kontrol
 2. Sıradaki gap: #2 (Analytics feedback) veya #3 (animasyonlu altyazı)
+
+---
+
+## Session 15 — 2026-06-30: WORKFLOW.md güncelleme + Karaoke Altyazı
+
+### #8 — WORKFLOW.md güncellendi
+- Eski (Session 11 öncesi) dosya yapısını anlatıyordu (renderer.py vb. yok).
+- Gerçek modül yapısına göre yenilendi: phase1/phase2/upload/cli + analysis/reframe, gerçek satır sayıları, reframe akışı + CLI örnekleri.
+
+### #3a — Karaoke (animasyonlu) altyazı
+- **captions.py:** `_karaoke_text()` (kelime başına `\k` etiketi, süreyi eşit dağıtır, yuvarlama artığı son kelimeye), `_style_line()` (karaoke: Primary=highlight/sarı, Secondary=beyaz). `write_ass(... karaoke=, highlight_color=)`.
+- **Opt-in:** `--karaoke` CLI + `CaptionConfig.karaoke` (default False). Statik mod **bit-bit aynı** (regresyon yok).
+- **Kelime zamanlaması notu:** state.json'da word-level timestamp yok; chunk süresi kelimelere eşit bölünerek yaklaşık karaoke sweep yapılıyor. Gerçek word-level için transcription'ın word_timestamps çıktısı ileride bağlanabilir.
+- **Test:** `tests/test_captions_karaoke.py` 9/9 PASS. Regresyon: reframe 10/10, refactor 10/10.
+
+### Yapılmadı (bilinçli ertelendi): #3b Sessizlik-kesme
+- **Neden:** Phase 2 klibi yeniden transkript ETMİYOR; altyazı zamanlamasını Phase 1 transkriptinden alıyor. Klip seviyesinde sessizlik kesme → altyazı desync. Güvenli yer **transkriptten önce** (Phase 1 download sonrası kaynak medyayı kırpmak), böylece tüm timestamp'ler doğru kurulur. Ayrı, daha büyük değişiklik — sonraki oturuma.
+
+### Next Steps
+1. Gerçek video E2E: `--auto-reframe --karaoke` görsel kontrol
+2. #3b sessizlik-kesme (transkript-öncesi tasarımıyla) VEYA #2 Analytics feedback

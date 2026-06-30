@@ -91,6 +91,7 @@ def main(argv=None) -> None:
         upload=args.upload,
         schedule_days=args.schedule,
         no_captions=args.no_captions,
+        karaoke=args.karaoke,
     )
     AOR.register_read("format_config", f"formats/{args.format}.json", __name__)
 

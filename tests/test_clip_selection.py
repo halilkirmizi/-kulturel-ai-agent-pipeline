@@ -32,7 +32,14 @@ def check(name, cond, detail=""):
 
 from analysis.clip_scoring import (
     _opens_mid_thought, _build_window_listing, _Window, CLIP_SYSTEM_PROMPT,
+    _overlap_ratio, _dedupe_overlapping, ScoredClip,
 )
+
+
+def _clip(start, end, score):
+    return ScoredClip(start=start, end=end, duration=end - start, hook_text="h",
+                      intro_script="", outro_script="", reason="", scores={},
+                      score_total=score)
 
 
 class Seg:
@@ -77,8 +84,26 @@ check("prompt asks to be harsh", "HARSH" in CLIP_SYSTEM_PROMPT)
 check("prompt keeps JSON contract", '"selections"' in CLIP_SYSTEM_PROMPT and "window_id" in CLIP_SYSTEM_PROMPT)
 
 
+# ── overlap dedupe ──────────────────────────────────────────────────────────
+print("\n[TEST 5] overlap dedupe")
+a = _clip(0, 20, 30)      # highest score
+b = _clip(2, 22, 28)      # overlaps a by 18/20 = 0.9 -> redundant, dropped
+c = _clip(50, 70, 25)     # disjoint from a -> kept
+d = _clip(52, 72, 20)     # overlaps c by 0.9 but lower score -> dropped
+check("heavy overlap ratio ~0.9", abs(_overlap_ratio(a, b) - 0.9) < 1e-6, str(_overlap_ratio(a, b)))
+check("disjoint ratio 0", _overlap_ratio(a, c) == 0.0)
+
+kept = _dedupe_overlapping([a, b, c, d])
+ids = {(k.start, k.end) for k in kept}
+check("keeps highest of each overlap group (a,c)", (0, 20) in ids and (50, 70) in ids)
+check("drops lower overlappers (b,d)", (2, 22) not in ids and (52, 72) not in ids)
+check("exactly two kept", len(kept) == 2, str(len(kept)))
+check("disjoint set untouched",
+      len(_dedupe_overlapping([_clip(0, 10, 5), _clip(50, 60, 4)])) == 2)
+
+
 # ── config wiring ───────────────────────────────────────────────────────────
-print("\n[TEST 5] config wiring")
+print("\n[TEST 6] config wiring")
 from core.config import build_config
 check("default rich (legacy_select False)", build_config().legacy_select is False)
 check("override legacy_select", build_config(legacy_select=True).legacy_select is True)

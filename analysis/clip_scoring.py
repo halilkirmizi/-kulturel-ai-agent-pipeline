@@ -272,6 +272,31 @@ def _parse_llm_json(text: str) -> dict:
     return json.loads(clean)
 
 
+# ── Overlap dedupe ─────────────────────────────
+
+
+def _overlap_ratio(a: "ScoredClip", b: "ScoredClip") -> float:
+    """Time-overlap of two clips as a fraction of the shorter clip (0..1)."""
+    lo = max(a.start, b.start)
+    hi = min(a.end, b.end)
+    overlap = max(0.0, hi - lo)
+    shorter = min(a.end - a.start, b.end - b.start)
+    return overlap / shorter if shorter > 0 else 0.0
+
+
+def _dedupe_overlapping(clips: List["ScoredClip"], max_overlap: float = 0.5) -> List["ScoredClip"]:
+    """Drop redundant overlapping clips, keeping the higher-scored one.
+
+    Greedy: take clips by score (desc); accept a clip only if it does not
+    overlap an already-accepted clip by more than ``max_overlap``.
+    """
+    accepted: List["ScoredClip"] = []
+    for c in sorted(clips, key=lambda x: x.score_total, reverse=True):
+        if all(_overlap_ratio(c, a) <= max_overlap for a in accepted):
+            accepted.append(c)
+    return accepted
+
+
 # ── Fallback ───────────────────────────────────
 
 
@@ -490,6 +515,13 @@ def score_clips(
         fb = _fallback_clip(segments)
         if fb:
             results.append(fb)
+
+    # Drop redundant overlapping selections (keeps higher score). Skipped in legacy.
+    if not getattr(config, "legacy_select", False) and len(results) > 1:
+        before = len(results)
+        results = _dedupe_overlapping(results)
+        if len(results) < before:
+            log.info("Deduped %d overlapping clip(s)", before - len(results))
 
     results.sort(key=lambda x: x.score_total, reverse=True)
 

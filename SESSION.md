@@ -8,7 +8,7 @@
 ## GÜNCEL DURUM — 2026-06-30
 
 **Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
-**Test:** `python tests/run_all.py` → **10/10 suite, 116/116 check PASS** (+learning, +clip_selection).
+**Test:** `python tests/run_all.py` → **10/10 suite, 122/122 check PASS** (+learning, +clip_selection +dedupe).
 **Klip seçim kalitesi düzeltildi:** LLM artık pencerelerin tam metnini görüyor (önceden kör). `--legacy-select` ile eskiye dönülür. Gerçek A/B yapısal iyileşmeyi gösterdi.
 
 **learning_engine eklendi (SİMÜLASYON):** `--propose-weights` performans verisinden boyut-ağırlığı + feature lift önerir, weights_vN.json yazar, ASLA uygulamaz. Geri besleme döngüsünün "öğrenme" hesabı artık var; tek kalan onu config'e UYGULAMAK (canlı mod, gerçek veri biriktikten sonra).
@@ -46,7 +46,12 @@
 - Tam matris: **10/10 suite, 116/116 check PASS**.
 
 ### Not
-- Gerçek "kalite" subjektif; A/B yapısal iyileşmeyi gösteriyor (içerik görünürlüğü, örtüşme elenmesi, hook bulma). Daha fazla iyileşme istenirse: örtüşen pencereleri dedupe, fallback klip kalitesi, window boyut ayarı.
+- Gerçek "kalite" subjektif; A/B yapısal iyileşmeyi gösteriyor (içerik görünürlüğü, örtüşme elenmesi, hook bulma).
+
+### Ek (aynı oturum): örtüşen klip dedupe
+- `_overlap_ratio` + `_dedupe_overlapping` (clip_scoring.py): seçim sonrası >%50 örtüşen klipler elenir, yüksek skorlu tutulur. Deterministik, legacy_select'te kapalı. Return tipi/sözleşme aynı.
+- Test: test_clip_selection 20/20. Tam matris: **10/10 suite, 122/122 check PASS**.
+- Kalan kalite fikirleri: fallback klip kalitesi, window boyut ayarı.
 
 ---
 

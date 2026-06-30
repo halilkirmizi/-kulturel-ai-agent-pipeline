@@ -37,6 +37,8 @@ def build_crop_command(
         vf_parts.append("scale=1080:1920")
         vf_parts.append("setsar=1")
     else:
+        # Crop with extra height to include hardcoded subtitles at bottom
+        # Use exact 9:16 ratio, scale handles the rest
         vf_parts.append("crop=ih*9/16:ih:(iw-ih*9/16)/2:0")
         vf_parts.append(f"scale=1080:1920:flags={clip_cfg.resize_flags}")
         vf_parts.append("setsar=1")

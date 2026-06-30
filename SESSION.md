@@ -27,6 +27,7 @@
 | **17** | **2026-06-30** | **Gerçek-yürütme entegrasyon testi (ffmpeg E2E, 3 özellik doğrulandı)** | **✅** |
 | **18** | **2026-06-30** | **#2 Performans geri besleme katmanı (video_id + analytics + score)** | **✅** |
 | **19** | **2026-06-30** | **Canlı render testi (karaoke) + Windows rename->replace fix + test runner** | **✅** |
+| **20** | **2026-06-30** | **'fit' framing (tam genişlik + bulanık dolgu) — gömülü altyazı kesilmesin** | **✅** |
 
 ---
 
@@ -361,3 +362,27 @@ refactor 10/10 · reframe 10/10 · karaoke 9/9 · silence 16/16 · integration 8
 ### Next Steps
 1. learning_engine (performance_score → weight, simulation-first)
 2. Gerçek YouTube URL ile Phase 1 E2E (`--auto-reframe --trim-silence`)
+
+---
+
+## Session 20 — 2026-06-30: 'fit' framing (gömülü altyazı kesilmesini önle)
+
+### Sorun (kullanıcı)
+- Kaynak yatay (1920x1080), altyazı tam genişlikte gömülü. 9:16 ortadan crop sağ/sol kenarları (altyazının baş/son kısmını) kesiyor → altyazının bir kısmı görünmüyor.
+
+### Çözüm: 'fit' framing modu
+- **render_core._build_fit_command:** `[0:v]split` → bg (scale increase + crop 1080x1920 + boxblur) + fg (scale decrease, tam kare sığar) → overlay merkez. filter_complex form, `-map 0:a?`.
+- Tam genişlik korunur → gömülü altyazı tam görünür. Standart "blurred background" shorts görünümü.
+- **Opt-in:** `--framing {crop,fit}` (default crop) + `PipelineConfig.framing` + format JSON `clip.framing`. Football kendi crop'unu korur.
+
+### Doğrulama
+- `tests/test_framing.py` 11/11 PASS (komut şekli + config + gerçek ffmpeg fit render 1080x1920).
+- Tam matris: `tests/run_all.py` **7/7 suite, 83/83 check PASS**.
+- **Canlı kanıt:** orijinal kaynak `temp/XyU3zRLJ-Xs.mp4` (1920x1080) segment 147.94–166.62 fit ile render edildi → `clip_FIT_demo.mp4` (1080x1920), kullanıcıya gösterildi.
+
+### Açık karar
+- fit dolgu stili şimdilik bulanık-bg. Alternatif (siyah bar) istenirse tek satır değişiklik. Kullanıcı fit demosunu izliyor.
+
+### Next Steps
+1. Kullanıcı onayı: fit görünümü iyi mi (bulanık bg vs siyah bar)?
+2. learning_engine / gerçek Phase 1 E2E

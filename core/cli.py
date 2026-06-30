@@ -25,6 +25,8 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
                         help="Content type for specialized framing (default: general)")
     parser.add_argument("--auto-reframe", action="store_true",
                         help="Subject-aware 9:16 crop (face tracking) instead of centre crop")
+    parser.add_argument("--framing", default="crop", choices=["crop", "fit"],
+                        help="9:16 framing: 'crop' (default) or 'fit' (full frame on blurred fill, keeps full-width subtitles)")
     parser.add_argument("--upload", action="store_true", help="Upload final video to YouTube")
     parser.add_argument("--schedule", type=int, default=-1, help="Schedule upload N days from now")
     parser.add_argument("--no-captions", action="store_true", help="Skip caption overlay")

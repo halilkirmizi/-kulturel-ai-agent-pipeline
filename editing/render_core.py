@@ -38,6 +38,13 @@ def build_crop_command(
     duration = end - start
     clip_cfg = config.clip
 
+    # Fit mode: preserve the FULL frame width (so hardcoded/full-width subtitles
+    # are not cut by a 9:16 crop). The whole frame is scaled to fit and centred
+    # over a blurred, zoomed copy of itself. General content only; football keeps
+    # its dedicated crop framing.
+    if config.content_type != "football" and getattr(config, "framing", "crop") == "fit":
+        return _build_fit_command(video_path, start, duration, output_path, config, clip_cfg)
+
     vf_parts = ["setpts=PTS-STARTPTS"]
 
     if config.content_type == "football":
@@ -63,6 +70,41 @@ def build_crop_command(
         "-i", str(video_path),
         "-t", str(duration),
         "-vf", vf,
+        "-c:a", "aac",
+        "-b:a", "128k",
+        "-vsync", "0",
+    ]
+    cmd.extend(gpu_encode_args(config))
+    cmd.append(str(output_path))
+
+    if config.gpu_enabled:
+        cmd.insert(cmd.index("-ss"), "-hwaccel")
+        cmd.insert(cmd.index("-hwaccel") + 1, "cuda")
+
+    return cmd
+
+
+def _build_fit_command(video_path, start, duration, output_path, config, clip_cfg) -> list:
+    """9:16 'fit' framing: full frame scaled to fit, centred on a blurred fill.
+
+    Keeps the entire source width visible (no side crop) so full-width burned-in
+    subtitles survive. Returns an ffmpeg command list (filter_complex form).
+    """
+    fc = (
+        "[0:v]setpts=PTS-STARTPTS,split=2[bg][fg];"
+        "[bg]scale=1080:1920:force_original_aspect_ratio=increase,"
+        "crop=1080:1920,boxblur=20:5[bgb];"
+        f"[fg]scale=1080:1920:force_original_aspect_ratio=decrease:flags={clip_cfg.resize_flags}[fgs];"
+        "[bgb][fgs]overlay=(W-w)/2:(H-h)/2,setsar=1[v]"
+    )
+    cmd = [
+        ffmpeg_path(), "-y",
+        "-ss", str(start),
+        "-i", str(video_path),
+        "-t", str(duration),
+        "-filter_complex", fc,
+        "-map", "[v]",
+        "-map", "0:a?",
         "-c:a", "aac",
         "-b:a", "128k",
         "-vsync", "0",

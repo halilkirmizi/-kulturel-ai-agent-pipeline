@@ -114,6 +114,10 @@ class PipelineConfig:
     # Content
     content_type: str = "general"
 
+    # Framing: "crop" (9:16 centre crop, default) or "fit" (full frame on
+    # blurred fill — keeps full-width burned-in subtitles visible).
+    framing: str = "crop"
+
     # Reframe (subject-aware crop). Opt-in; default keeps centre crop.
     auto_reframe: bool = False
 
@@ -204,6 +208,7 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         llm_max_chars=int(os.getenv("LLM_MAX_CHARS", "30000")),
         # Content
         content_type=overrides.get("content_type", "general"),
+        framing=overrides.get("framing", _g("clip", "framing", "crop")),
         auto_reframe=overrides.get("auto_reframe", False),
         trim_silence=overrides.get("trim_silence", False),
         silence_noise_db=str(_g("silence", "noise_db", "-30dB")),

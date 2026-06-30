@@ -21,3 +21,4 @@
 2026-06-30: Fix: klip seçim kalitesi — LLM artık pencerelerin TAM metnini görüyor (önceden sadece baş/son önizleme → kör seçim). Mid-thought işaretleme + sertleştirilmiş prompt. Eski davranış `--legacy-select`. JSON sözleşmesi değişmedi. Gerçek A/B: yeni mod açılış klibini buldu + örtüşen klipleri eledi (clip_scoring.py)
 2026-06-30: Add: örtüşen klip dedupe — seçim sonrası >%50 zaman örtüşen klipler elenir (yüksek skorlu tutulur), deterministik. legacy_select'te kapalı (clip_scoring._dedupe_overlapping)
 2026-06-30: Improve: fallback klip kalitesi — "en uzun segment" yerine aday pencereler arasından bilgi-yoğun + cümle-ortası başlamayan en iyi pencere (deterministik heuristik, clip_scoring._fallback_window_score)
+2026-06-30: Improve: çok-uzunluklu aday pencereler — sabit 22sn yerine 15/22/30sn pencereler üretilir (düşünce tek boyuta zorlanmaz), dedupe + MAX_WINDOWS=30 sınırı (clip_scoring._build_windows)

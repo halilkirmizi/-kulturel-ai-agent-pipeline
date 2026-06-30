@@ -41,7 +41,9 @@ class ScoredClip:
 MIN_CLIP = 12
 MAX_CLIP = 35
 TARGET_WIN = 22
+TARGET_WINS = (15, 22, 30)   # multiple candidate lengths so a thought is not forced into one size
 WIN_OVERLAP = 7
+MAX_WINDOWS = 30             # cap candidate count to keep the prompt bounded
 _REQUIRED_SCORE_DIMS = ["curiosity", "emotional_relevance", "educational_value", "narrative_completeness"]
 
 
@@ -56,63 +58,77 @@ class _Window:
     text: str
 
 
-def _build_windows(segments: list, target: float = TARGET_WIN, overlap: float = WIN_OVERLAP) -> List[_Window]:
-    """Build overlapping windows from whisper segments.
+def _window_text(segments: list, start: float, end: float) -> str:
+    """Concatenated transcript text for the segments inside [start, end]."""
+    parts = []
+    for s in segments:
+        if s.end <= start:
+            continue
+        if s.start >= end:
+            break
+        if s.text and s.text.strip():
+            parts.append(s.text.strip())
+    return " ".join(parts)
 
-    Each window targets ~target seconds with ~overlap seconds of overlap.
-    Windows snap to segment boundaries for clean sentence cuts.
+
+def _build_windows(
+    segments: list, targets=TARGET_WINS, overlap: float = WIN_OVERLAP
+) -> List[_Window]:
+    """Build overlapping candidate windows at MULTIPLE target lengths.
+
+    Generating short/medium/long windows at each position lets the selector
+    pick the duration that best fits a complete thought, instead of forcing
+    every candidate into one fixed size. Windows snap to segment boundaries,
+    duplicates are merged, and the count is capped (MAX_WINDOWS) so the prompt
+    stays bounded.
     """
     if not segments:
         return []
 
-    ends = [s.end for s in segments]
-    total_dur = max(ends)
-    step = target - overlap
-
-    # Build list of all segment boundaries for snapping
+    total_dur = max(s.end for s in segments)
     all_starts = sorted({s.start for s in segments})
     all_ends = sorted({s.end for s in segments})
 
     def _snap_to_start(t: float) -> float:
-        """Snap time to nearest segment start (round down)."""
         for st in reversed(all_starts):
             if st <= t:
                 return st
         return all_starts[0]
 
     def _snap_to_end(t: float) -> float:
-        """Snap time to nearest segment end (round up)."""
         for ed in all_ends:
             if ed >= t:
                 return ed
         return all_ends[-1]
 
-    windows: List[_Window] = []
-    cur_start = 0.0
-    wid = 0
+    raw: List[Tuple[float, float]] = []
+    for target in targets:
+        step = max(5.0, target - overlap)
+        cur = 0.0
+        while cur < total_dur - 2:
+            ss = _snap_to_start(cur)
+            se = _snap_to_end(min(cur + target, total_dur))
+            if se - ss >= MIN_CLIP:
+                raw.append((ss, se))
+            cur += step
 
-    while cur_start < total_dur - 2:
-        cur_end = min(cur_start + target, total_dur)
+    # Merge duplicate spans (different targets snap to the same bounds).
+    seen = set()
+    uniq: List[Tuple[float, float]] = []
+    for ss, se in sorted(raw):
+        key = (round(ss, 1), round(se, 1))
+        if key not in seen:
+            seen.add(key)
+            uniq.append((ss, se))
 
-        # Snap to segment boundaries
-        snap_start = _snap_to_start(cur_start)
-        snap_end = _snap_to_end(cur_end)
+    # Cap candidate count: subsample evenly across the video if needed.
+    if len(uniq) > MAX_WINDOWS:
+        idx = sorted({round(i * (len(uniq) - 1) / (MAX_WINDOWS - 1)) for i in range(MAX_WINDOWS)})
+        uniq = [uniq[i] for i in idx]
 
-        seg_texts = []
-        for s in segments:
-            if s.end <= snap_start:
-                continue
-            if s.start >= snap_end:
-                break
-            if s.text and s.text.strip():
-                seg_texts.append(s.text.strip())
-
-        text = " ".join(seg_texts)
-        windows.append(_Window(wid=wid, start=snap_start, end=snap_end, text=text))
-        wid += 1
-        cur_start += step
-
-    log.info("Built %d windows (target=%.0fs, overlap=%.0fs)", len(windows), target, overlap)
+    windows = [_Window(wid=i, start=ss, end=se, text=_window_text(segments, ss, se))
+               for i, (ss, se) in enumerate(uniq)]
+    log.info("Built %d windows (targets=%s, overlap=%.0fs)", len(windows), tuple(targets), overlap)
     return windows
 
 
@@ -209,8 +225,8 @@ def _build_window_listing(
 
         if rich:
             body = (w.text or "").strip().replace("\n", " ")
-            if len(body) > 600:
-                body = body[:600] + "…"
+            if len(body) > 450:
+                body = body[:450] + "…"
             lines.append(f'  TEXT: "{body}"')
         else:
             first_segs = [s for s in segments if abs(s.start - w.start) < 0.5]

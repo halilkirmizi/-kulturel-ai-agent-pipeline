@@ -8,7 +8,7 @@
 ## GÜNCEL DURUM — 2026-06-30
 
 **Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
-**Test:** `python tests/run_all.py` → **10/10 suite, 127/127 check PASS** (+learning, +clip_selection: full-text+dedupe+fallback).
+**Test:** `python tests/run_all.py` → **10/10 suite, 132/132 check PASS** (+learning, +clip_selection: full-text+dedupe+fallback+multi-length).
 **Klip seçim kalitesi düzeltildi:** LLM artık pencerelerin tam metnini görüyor (önceden kör). `--legacy-select` ile eskiye dönülür. Gerçek A/B yapısal iyileşmeyi gösterdi.
 
 **learning_engine eklendi (SİMÜLASYON):** `--propose-weights` performans verisinden boyut-ağırlığı + feature lift önerir, weights_vN.json yazar, ASLA uygulamaz. Geri besleme döngüsünün "öğrenme" hesabı artık var; tek kalan onu config'e UYGULAMAK (canlı mod, gerçek veri biriktikten sonra).
@@ -54,8 +54,12 @@
 
 ### Ek (aynı oturum): fallback klip kalitesi
 - `_fallback_window_score` + yeniden yazılan `_fallback_clip`: model hiç klip seçemezse "en uzun segment" yerine aday pencereler arasından **bilgi-yoğun + cümle-ortası başlamayan** en iyi pencereyi seçer (deterministik, TARGET_WIN'e yakın süre tercih). Last-resort açılış span'i korundu.
-- Test: test_clip_selection 25/25. Tam matris: **10/10 suite, 127/127 check PASS**.
-- Kalan kalite fikri: window boyutunu içeriğe göre ayarlama.
+- Test: test_clip_selection 25/25.
+
+### Ek (aynı oturum): çok-uzunluklu pencereler
+- `_build_windows` artık 15/22/30sn hedeflerinde pencere üretir (düşünce tek boyuta zorlanmaz), dedupe + MAX_WINDOWS=30 cap (prompt bütçesi). Listing metni 450 char/pencere.
+- Test: test_clip_selection 30/30. Tam matris: **10/10 suite, 132/132 check PASS**.
+- **Klip seçim kalitesi 4 katman tamamlandı:** tam-metin görünürlük + sert prompt/mid-thought + örtüşme dedupe + kaliteli fallback + çok-uzunluklu aday.
 
 ---
 

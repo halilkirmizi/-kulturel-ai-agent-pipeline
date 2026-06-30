@@ -34,6 +34,7 @@ from analysis.clip_scoring import (
     _opens_mid_thought, _build_window_listing, _Window, CLIP_SYSTEM_PROMPT,
     _overlap_ratio, _dedupe_overlapping, ScoredClip,
     _fallback_window_score, _fallback_clip, MIN_CLIP, MAX_CLIP,
+    _build_windows, MAX_WINDOWS, TARGET_WINS,
 )
 
 
@@ -123,8 +124,21 @@ check("fallback prefers dense window (starts at 0)", fb is not None and fb.start
 check("empty -> None", _fallback_clip([]) is None)
 
 
+# ── multi-length windows ────────────────────────────────────────────────────
+print("\n[TEST 7] multi-length windows")
+# 60s of 3s segments -> windows at multiple target lengths.
+msegs = [Seg(i * 3.0, i * 3.0 + 3.0, f"sentence number {i} with several words here") for i in range(20)]
+ws = _build_windows(msegs)
+durs = {round(w.end - w.start) for w in ws}
+check("produces multiple distinct lengths", len(durs) >= 2, str(sorted(durs)))
+check("all windows >= MIN_CLIP", all((w.end - w.start) >= MIN_CLIP for w in ws))
+check("count capped at MAX_WINDOWS", len(ws) <= MAX_WINDOWS, str(len(ws)))
+check("wids are sequential", [w.wid for w in ws] == list(range(len(ws))))
+check("empty segments -> no windows", _build_windows([]) == [])
+
+
 # ── config wiring ───────────────────────────────────────────────────────────
-print("\n[TEST 7] config wiring")
+print("\n[TEST 8] config wiring")
 from core.config import build_config
 check("default rich (legacy_select False)", build_config().legacy_select is False)
 check("override legacy_select", build_config(legacy_select=True).legacy_select is True)

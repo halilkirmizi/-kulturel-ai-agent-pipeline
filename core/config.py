@@ -107,6 +107,12 @@ class PipelineConfig:
     llm_temperature: float = 0.3
     llm_max_chars: int = 30000
 
+    # Clip-selection provider: "groq" (default) or "claude" (Anthropic — stronger
+    # editorial judgment). Claude path reads ANTHROPIC_API_KEY from env.
+    select_provider: str = "groq"
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-opus-4-8"
+
     # Paths
     output_dir: Path = Path("./shorts_output")
     temp_dir: Path = Path("./temp")
@@ -214,6 +220,9 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
         llm_temperature=float(os.getenv("LLM_TEMPERATURE", "0.3")),
         llm_max_chars=int(os.getenv("LLM_MAX_CHARS", "30000")),
+        select_provider=overrides.get("select_provider", os.getenv("SELECT_PROVIDER", "groq")),
+        anthropic_api_key=overrides.get("anthropic_api_key") or os.getenv("ANTHROPIC_API_KEY", ""),
+        anthropic_model=os.getenv("ANTHROPIC_MODEL", "claude-opus-4-8"),
         # Content
         content_type=overrides.get("content_type", "general"),
         legacy_select=overrides.get("legacy_select", False),

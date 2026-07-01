@@ -288,6 +288,30 @@ def _parse_llm_json(text: str) -> dict:
     return json.loads(clean)
 
 
+def _call_claude(config, system_prompt: str, user_prompt: str, client=None) -> dict:
+    """Call Anthropic Claude for clip selection; return parsed JSON dict.
+
+    `client` is injectable for testing. Reads ANTHROPIC_API_KEY from env unless
+    an explicit key is set in config.
+    """
+    if client is None:
+        import anthropic
+        client = (anthropic.Anthropic(api_key=config.anthropic_api_key)
+                  if config.anthropic_api_key else anthropic.Anthropic())
+    resp = client.messages.create(
+        model=config.anthropic_model,
+        max_tokens=8000,
+        system=system_prompt,
+        messages=[{"role": "user", "content": user_prompt}],
+    )
+    text = "".join(
+        getattr(b, "text", "") for b in resp.content
+        if getattr(b, "type", None) == "text"
+    )
+    log.info("Claude selection response: %d chars", len(text))
+    return _parse_llm_json(text)
+
+
 def _weighted_total(scores: dict, dim_weights: Optional[dict]) -> float:
     """Sum of dimension scores, optionally re-weighted by learned multipliers.
 
@@ -451,9 +475,8 @@ def score_clips(
     Returns:
         List of ScoredClip objects, sorted by total score descending.
     """
-    from groq import Groq
-
-    if not config.groq_api_key:
+    provider = getattr(config, "select_provider", "groq")
+    if provider != "claude" and not config.groq_api_key:
         raise ValueError("GROQ_API_KEY not set — cannot run clip scoring")
 
     if dim_weights:
@@ -471,8 +494,6 @@ def score_clips(
         windows, segments, max_chars=config.llm_max_chars // 2,
         rich=not getattr(config, "legacy_select", False),
     )
-
-    client = Groq(api_key=config.groq_api_key)
 
     # Inject memory bias into the prompt
     bias_lines = []
@@ -496,19 +517,28 @@ def score_clips(
             f"{user_prompt}"
         )
 
-    def _call_llm() -> dict:
-        response = client.chat.completions.create(
-            model=config.groq_model,
-            messages=[
-                {"role": "system", "content": CLIP_SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=config.llm_temperature,
-            response_format={"type": "json_object"},
-        )
-        raw = response.choices[0].message.content
-        log.info("LLM response: %d chars", len(raw))
-        return _parse_llm_json(raw)
+    if provider == "claude":
+        log.info("Clip selection via Claude (%s)", config.anthropic_model)
+
+        def _call_llm() -> dict:
+            return _call_claude(config, CLIP_SYSTEM_PROMPT, user_prompt)
+    else:
+        from groq import Groq
+        client = Groq(api_key=config.groq_api_key)
+
+        def _call_llm() -> dict:
+            response = client.chat.completions.create(
+                model=config.groq_model,
+                messages=[
+                    {"role": "system", "content": CLIP_SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=config.llm_temperature,
+                response_format={"type": "json_object"},
+            )
+            raw = response.choices[0].message.content
+            log.info("LLM response: %d chars", len(raw))
+            return _parse_llm_json(raw)
 
     try:
         analysis = _call_llm()

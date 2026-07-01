@@ -22,4 +22,5 @@
 2026-06-30: Add: örtüşen klip dedupe — seçim sonrası >%50 zaman örtüşen klipler elenir (yüksek skorlu tutulur), deterministik. legacy_select'te kapalı (clip_scoring._dedupe_overlapping)
 2026-06-30: Improve: fallback klip kalitesi — "en uzun segment" yerine aday pencereler arasından bilgi-yoğun + cümle-ortası başlamayan en iyi pencere (deterministik heuristik, clip_scoring._fallback_window_score)
 2026-06-30: Improve: çok-uzunluklu aday pencereler — sabit 22sn yerine 15/22/30sn pencereler üretilir (düşünce tek boyuta zorlanmaz), dedupe + MAX_WINDOWS=30 sınırı (clip_scoring._build_windows)
+2026-07-01: Add: klip seçici sağlayıcı seçimi — `--select-with claude` ile Groq/LLaMA yerine Anthropic Claude (claude-opus-4-8) klip seçer (daha iyi editoryal yargı). Default groq (bozulmadı). ANTHROPIC_API_KEY gerekir. anthropic SDK eklendi (clip_scoring._call_claude)
 2026-06-30: Add: öğrenme döngüsü KAPANDI (ROADMAP STEP 5) — `--apply-weights` ile öğrenilen boyut-ağırlıkları klip skorlamasına uygulanır (sınırlı 0.5-1.5, opt-in, güvenilir öneri yokken no-op). load_latest_weights + _weighted_total. DAG/AOR/Contract'a dokunmaz

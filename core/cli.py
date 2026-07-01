@@ -25,6 +25,8 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
                         help="Content type for specialized framing (default: general)")
     parser.add_argument("--legacy-select", action="store_true",
                         help="Revert clip selection to old preview-only listing (default: rich full-text)")
+    parser.add_argument("--select-with", default="groq", choices=["groq", "claude"],
+                        help="Clip selection model provider: 'groq' (default) or 'claude' (needs ANTHROPIC_API_KEY)")
     parser.add_argument("--auto-reframe", action="store_true",
                         help="Subject-aware 9:16 crop (face tracking) instead of centre crop")
     parser.add_argument("--framing", default="crop", choices=["crop", "fit"],

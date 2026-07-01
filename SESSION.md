@@ -5,6 +5,13 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-01
+
+**Klip seçiciyi Claude yapabiliyor:** `--select-with claude` → Groq/LLaMA yerine Anthropic Claude (`claude-opus-4-8`) klip seçer. Default `groq` (bozulmadı). **Kullanıcı `.env`'e `ANTHROPIC_API_KEY=...` eklemeli.** anthropic SDK kuruldu + requirements'ta.
+**Test:** `python tests/run_all.py` → **12/12 suite, 154/154 check PASS**.
+
+---
+
 ## GÜNCEL DURUM — 2026-06-30
 
 **Repo:** pipeline/.git tek aktif depo, GitHub origin/main ile senkron, çalışma ağacı temiz. (Legacy dış git `_archive`'a alındı.)
@@ -25,6 +32,29 @@
 **Sıradaki tek büyük iş:** `learning_engine` — performance_score → klip-seçim ağırlıkları (ROADMAP STEP 3, simulation-first). Geri besleme döngüsünü kapatır.
 **Test edilmeyen (kullanıcı tetikler):** gerçek YouTube URL ile Phase 1 E2E; gerçek upload + 1-2 gün sonra `--fetch-analytics` canlı stats.
 **Kural:** Her feature sonunda `tests/run_all.py` (büyük çaplı test) çalıştır.
+
+---
+
+## Session 25 — 2026-07-01: Klip Seçiciyi Claude Yapabilme
+
+### İstek (kullanıcı)
+- "Groq çok kötü klip seçiyor — Groq yerine sen (Claude) seç." → seçim adımını sağlayıcı-seçmeli yap.
+
+### Yapıldı
+- **clip_scoring._call_claude:** Anthropic Python SDK ile `client.messages.create(model=claude-opus-4-8, system=CLIP_SYSTEM_PROMPT, messages=[user])`; text bloklarından JSON parse (`_parse_llm_json`). `client` enjekte edilebilir (test).
+- **score_clips:** `provider = config.select_provider`. claude → `_call_claude`; groq → eski yol (aynı). Groq anahtar kontrolü sadece groq'ta. Retry/parse/validation/dedupe/fallback aynı.
+- **config/cli/main:** `--select-with {groq,claude}` (default groq) + `PipelineConfig.select_provider` + `anthropic_api_key` (env ANTHROPIC_API_KEY) + `anthropic_model` (default claude-opus-4-8).
+- **requirements:** `anthropic>=0.40.0` (kuruldu). CLIP_SYSTEM_PROMPT/pencere yapısı sağlayıcıdan bağımsız — ikisi de aynı zengin prompt'u alır.
+
+### Not / kısıt
+- claude-api skill'i okundu (doğru model ID + SDK kullanımı). thinking kullanılmadı (SDK-versiyon uyumu + JSON temizliği için); Opus 4.8 ham hâliyle LLaMA 3.3 70B'den çok üstün.
+- Gerçek API çağrısı test edilmedi (anahtar yok) → mock client ile parse/wiring test edildi. **Canlı kullanım için kullanıcı `.env`'e `ANTHROPIC_API_KEY` eklemeli.**
+
+### Test
+- `tests/test_claude_select.py` 11/11. Tam matris: **12/12 suite, 154/154 check PASS**.
+
+### Kullanım
+- `python main.py <link> --select-with claude`  (Groq default; Claude opt-in)
 
 ---
 

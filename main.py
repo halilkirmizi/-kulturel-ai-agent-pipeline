@@ -87,6 +87,7 @@ def main(argv=None) -> None:
         format_name=args.format,
         content_type=args.content_type,
         legacy_select=args.legacy_select,
+        select_provider=args.select_with,
         apply_weights=args.apply_weights,
         framing=args.framing,
         auto_reframe=args.auto_reframe,

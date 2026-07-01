@@ -90,6 +90,11 @@ def _write_ass(segments, ass_path, fontsize, margin_bottom, clip_dur, start_offs
     lines = [
         "[Script Info]",
         "ScriptType: v4.00+",
+        # Pin the coordinate space to the real 9:16 frame so MarginV / positions
+        # are in actual pixels (without this, libass defaults to 384x288 and
+        # pixel values land off-screen).
+        "PlayResX: 1080",
+        "PlayResY: 1920",
         "WrapStyle: 0",
         "ScaledBorderAndShadow: yes",
         "YCbCr Matrix: None",

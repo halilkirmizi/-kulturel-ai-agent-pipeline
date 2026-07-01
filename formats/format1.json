@@ -16,11 +16,11 @@
     "crossfade_duration": 3.0
   },
   "captions": {
-    "fontsize": 38,
+    "fontsize": 78,
     "uppercase": true,
     "outline": 2,
     "box_border": 4,
-    "margin_bottom": 160,
+    "margin_bottom": 420,
     "box_color": "black@0.4",
     "shadow_color": "black",
     "font": "C:/Windows/Fonts/impact.ttf"

@@ -434,12 +434,21 @@ Scoring criteria (each 0-10):
 
 Be HARSH: give 7+ ONLY to windows you would personally watch to the end.
 Pick diverse moments across the full video (WIN-IDs far apart are better).
+
+HOOK RULES (hook_text = the video's title AND the on-screen hook — make it SCROLL-STOPPING):
+- 3-7 words. A bold claim, a curiosity gap, or a question — NEVER a bland summary.
+- Name the person/subject when it adds pull. Front-load the most intriguing word.
+- BAD (do not do this): "Scoring Goals", "Norway's Big Stage", "Erling's Fans".
+- GOOD: "Haaland's Real Motivation", "Why Norway Can Shock Everyone",
+  "The Fans Who Crossed Oceans", "Haaland Finally Admits It".
+- No period at the end. Title Case. It must make someone stop scrolling.
+
 Return ONLY valid JSON with this exact structure:
 {
   "selections": [
     {
       "window_id": 3,
-      "hook_text": "2-4 word attention-grabbing summary that makes people want to watch",
+      "hook_text": "SCROLL-STOPPING 3-7 word title (bold claim / curiosity gap / question) per HOOK RULES — not a summary",
       "intro_script": "5-8 second spoken hook (1-2 sentences to grab attention)",
       "outro_script": "5-10 second closing thought or context",
       "reason": "why this works as a short (max 20 words)",

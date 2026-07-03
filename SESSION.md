@@ -5,10 +5,23 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-03 (session sonu)
+
+**İlk tam E2E + yükleme yapıldı:** Haaland WC vlog → 3 Short üretildi + YouTube'a yüklendi (unlisted). Ayrıca Arjantin/Messi klibi (İngilizce çevrili altyazı) yüklendi. Toplam 4 video canlı.
+**Bu oturumda eklenenler:**
+- `--select-with claude` (Groq yerine Claude klip seçer; ANTHROPIC_API_KEY gerekir, default groq).
+- **Altyazı konumu fix:** ASS'e PlayResX/Y=1080x1920 (yoksa libass 384x288 varsayıp altyazıyı kaçırıyordu). format1 fontsize 78, margin_bottom 420 (alt-üçte-bir).
+- **Hook/başlık capturing:** CLIP_SYSTEM_PROMPT HOOK RULES + youtube_title/description alanları (sansasyonel ALL CAPS + emoji + hashtag). upload.py bunları kullanır, alansız kliplere fallback.
+- **Yükleme görünürlük:** `--publish-at "YYYY-MM-DD HH:MM"` (programlı public), dil en (`--lang`), kategori Sports(17), otomatik 3-5 etiket, madeForKids=false.
+- Windows saati Avrupa (CEST) → publish-at makinenin tz'ini kullanır, doğru.
+**Test:** `python tests/run_all.py` → **13/13 suite, 169/169 check PASS**.
+**Açık konu (sonraki oturum):** Yüklenenler `unlisted` → 0 izlenme normal; izlenme için Public gerekir. İstenirse `--public` bayrağı eklenecek. Ayrıca eski render'lı ~5 klip yüklenmeyi bekliyor (düzeltilmiş altyazıyla yeniden render + başlıkla).
+
+---
+
 ## GÜNCEL DURUM — 2026-07-01
 
-**Klip seçiciyi Claude yapabiliyor:** `--select-with claude` → Groq/LLaMA yerine Anthropic Claude (`claude-opus-4-8`) klip seçer. Default `groq` (bozulmadı). **Kullanıcı `.env`'e `ANTHROPIC_API_KEY=...` eklemeli.** anthropic SDK kuruldu + requirements'ta.
-**Test:** `python tests/run_all.py` → **12/12 suite, 154/154 check PASS**.
+**Klip seçiciyi Claude yapabiliyor:** `--select-with claude` → Groq/LLaMA yerine Anthropic Claude (`claude-opus-4-8`) klip seçer. Default `groq` (bozulmadı). anthropic SDK kuruldu + requirements'ta.
 
 ---
 

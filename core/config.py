@@ -164,6 +164,9 @@ class PipelineConfig:
     # Upload
     upload_enabled: bool = False
     schedule_days: int = -1
+    publish_at: str = ""          # exact "YYYY-MM-DD HH:MM" scheduled publish (local time)
+    video_language: str = "en"    # snippet defaultLanguage / defaultAudioLanguage
+    video_category_id: str = "17"  # 17 = Sports (was 22 People & Blogs)
 
     def output_path(self) -> Path:
         return self.output_dir.resolve()
@@ -300,6 +303,9 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         ),
         upload_enabled=overrides.get("upload", False),
         schedule_days=overrides.get("schedule_days", -1),
+        publish_at=overrides.get("publish_at", ""),
+        video_language=overrides.get("video_language", os.getenv("VIDEO_LANGUAGE", "en")),
+        video_category_id=os.getenv("VIDEO_CATEGORY_ID", "17"),
         output_dir=Path(overrides.get("output_dir", "./shorts_output")),
         temp_dir=Path(overrides.get("temp_dir", "./temp")),
     )

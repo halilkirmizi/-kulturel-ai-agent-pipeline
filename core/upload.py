@@ -63,6 +63,38 @@ def _fallback_description(hook: str) -> str:
     return f"{tease} 👀🔥\nWatch till the end 🚀\n\n#Shorts #Football #Viral #WorldCup"
 
 
+def _build_tags(hook: str, title: str) -> list:
+    """3-5 focused keyword tags from the hook/title, plus base sport tags."""
+    import re
+    stop = {"the", "and", "for", "you", "this", "that", "with", "are", "was", "new", "must", "watch"}
+    kw = []
+    for w in re.findall(r"[A-Za-z]{3,}", f"{hook} {title}"):
+        wl = w.lower()
+        if wl not in stop and wl not in kw:
+            kw.append(wl)
+    tags = list(kw[:5])
+    for base in ("shorts", "football", "soccer", "worldcup"):
+        if base not in tags:
+            tags.append(base)
+    return tags[:10]
+
+
+def _to_publish_at_iso(s):
+    """Parse local 'YYYY-MM-DD HH:MM' to RFC3339. Returns None (empty/invalid) or
+    'PAST' (not in the future) so the caller can fall back to a normal upload."""
+    from datetime import datetime
+    s = (s or "").strip()
+    if not s:
+        return None
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.astimezone()  # attach the machine's local timezone
+    return dt.isoformat() if dt > datetime.now(dt.tzinfo) else "PAST"
+
+
 def _assert_valid_video(path: Path) -> None:
     """Validate video file via existence, size, ffmpeg probe."""
     from editing.ffmpeg_builder import probe_duration, probe_file
@@ -122,12 +154,22 @@ def run_upload(final_path: Path, config: PipelineConfig) -> None:
     write_state(state_path, state)
 
     try:
+        publish_at_iso = _to_publish_at_iso(getattr(config, "publish_at", ""))
+        if publish_at_iso == "PAST":
+            log.warning("  [publish-at] '%s' is not in the future — uploading unlisted instead",
+                        config.publish_at)
+            publish_at_iso = None
+        scheduled = bool(publish_at_iso) or config.schedule_days >= 0
         video_id = upload_with_retry(
             str(final_path),
             title=title,
             description=description,
-            privacy_status="unlisted" if config.schedule_days < 0 else "private",
+            tags=_build_tags(hook, title),
+            privacy_status="private" if scheduled else "unlisted",
             schedule_days=config.schedule_days,
+            publish_at=publish_at_iso,
+            category_id=getattr(config, "video_category_id", "17"),
+            language=getattr(config, "video_language", "en"),
         )
         if video_id:
             log.info("  [OK] Upload complete")

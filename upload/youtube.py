@@ -157,6 +157,9 @@ def upload_video(
     tags: Optional[list] = None,
     privacy_status: str = "unlisted",
     schedule_days: int = -1,
+    publish_at: Optional[str] = None,
+    category_id: str = "22",
+    language: str = "en",
 ) -> Optional[str]:
     """Upload a video to YouTube.
 
@@ -200,8 +203,10 @@ def upload_video(
         "snippet": {
             "title": title[:100],
             "description": description[:5000],
-            "tags": tags or [],
-            "categoryId": "22",
+            "tags": (tags or [])[:15],
+            "categoryId": category_id,
+            "defaultLanguage": language,
+            "defaultAudioLanguage": language,
         },
         "status": {
             "privacyStatus": privacy_status,
@@ -209,11 +214,16 @@ def upload_video(
         },
     }
 
-    if schedule_days >= 0:
+    if publish_at:
+        # Exact scheduled release — the video must be private until publishAt.
+        body["status"]["privacyStatus"] = "private"
+        body["status"]["publishAt"] = publish_at
+        log.info("Scheduled public release at %s", publish_at)
+    elif schedule_days >= 0:
         from datetime import datetime, timedelta, timezone
-        publish_at = datetime.now(timezone.utc) + timedelta(days=schedule_days)
-        body["status"]["publishAt"] = publish_at.isoformat()
-        log.info("Scheduled for %s", publish_at.isoformat())
+        pub = datetime.now(timezone.utc) + timedelta(days=schedule_days)
+        body["status"]["publishAt"] = pub.isoformat()
+        log.info("Scheduled for %s", pub.isoformat())
 
     media = MediaFileUpload(str(video_path), chunksize=-1, resumable=True)
 

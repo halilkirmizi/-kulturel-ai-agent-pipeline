@@ -33,6 +33,9 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
                         help="9:16 framing: 'crop' (default) or 'fit' (full frame on blurred fill, keeps full-width subtitles)")
     parser.add_argument("--upload", action="store_true", help="Upload final video to YouTube")
     parser.add_argument("--schedule", type=int, default=-1, help="Schedule upload N days from now")
+    parser.add_argument("--publish-at", default="",
+                        help="Schedule public release at exact local time, e.g. \"2026-07-04 12:00\"")
+    parser.add_argument("--lang", default="en", help="Video language (defaultLanguage/defaultAudioLanguage)")
     parser.add_argument("--no-captions", action="store_true", help="Skip caption overlay")
     parser.add_argument("--karaoke", action="store_true",
                         help="Per-word karaoke caption highlighting (animated)")

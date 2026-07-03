@@ -51,6 +51,18 @@ def _record_provenance(video_id: str, state: dict, config: PipelineConfig) -> No
         log.warning("  [perf] provenance record failed: %s", exc)
 
 
+def _fallback_title(hook: str) -> str:
+    """Loud sensational title for clips without an LLM-generated youtube_title."""
+    base = (hook or "MUST WATCH").upper()
+    return f"{base} 🤯🔥⚽"[:100]
+
+
+def _fallback_description(hook: str) -> str:
+    """Engaging description + hashtags for clips without an LLM-generated one."""
+    tease = (hook or "You won't believe this").strip()
+    return f"{tease} 👀🔥\nWatch till the end 🚀\n\n#Shorts #Football #Viral #WorldCup"
+
+
 def _assert_valid_video(path: Path) -> None:
     """Validate video file via existence, size, ffmpeg probe."""
     from editing.ffmpeg_builder import probe_duration, probe_file
@@ -89,10 +101,13 @@ def run_upload(final_path: Path, config: PipelineConfig) -> None:
         state = read_state(state_path)
         validate_state(state)
         clip = state["clips"][0]
+        meta = clip.get("metadata", {})
         hook = clip.get("hook_text", "")
-        reason = clip.get("metadata", {}).get("reason", "")
-        title = hook if hook else "Untitled Analytical Short"
-        description = f"{reason}\n\n#shorts #analysis #culture" if reason else ""
+        # Prefer the LLM-generated sensational title/description; fall back to a
+        # loud generated one for older clips that predate those fields.
+        title = (meta.get("youtube_title") or "").strip() or _fallback_title(hook)
+        description = (meta.get("description") or "").strip() or _fallback_description(hook)
+        title = title[:100]
     except Exception as exc:
         raise PipelineError(f"Upload: state.json invalid — {exc}") from exc
 

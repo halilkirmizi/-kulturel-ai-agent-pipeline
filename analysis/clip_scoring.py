@@ -35,6 +35,8 @@ class ScoredClip:
     reason: str
     scores: Dict[str, float] = field(default_factory=dict)
     score_total: float = 0.0
+    youtube_title: str = ""   # sensational ALL-CAPS + emoji title for the upload
+    description: str = ""      # engaging description + hashtags for the upload
 
 
 # ── Constants ──────────────────────────────────
@@ -443,12 +445,21 @@ HOOK RULES (hook_text = the video's title AND the on-screen hook — make it SCR
   "The Fans Who Crossed Oceans", "Haaland Finally Admits It".
 - No period at the end. Title Case. It must make someone stop scrolling.
 
+YOUTUBE TITLE & DESCRIPTION (separate from hook_text — for the upload metadata):
+- youtube_title: SENSATIONAL, ALL CAPS, with 2-4 emojis. Maximum shock/curiosity, clickbait energy.
+  Max ~90 chars. Examples: "HAALAND'S BRUTAL TRUTH ABOUT SCORING 🤯⚽🔥", "NOBODY GIVES YOU ANYTHING 😤🇦🇷".
+- description: 2-3 short punchy lines with emojis that TEASE the moment (no spoilers), then a blank
+  line and 4-6 relevant hashtags. Example:
+  "He finally said what everyone was thinking 👀\nThis is why he's built different 🔥\n\n#Shorts #Football #WorldCup".
+
 Return ONLY valid JSON with this exact structure:
 {
   "selections": [
     {
       "window_id": 3,
       "hook_text": "SCROLL-STOPPING 3-7 word title (bold claim / curiosity gap / question) per HOOK RULES — not a summary",
+      "youtube_title": "SENSATIONAL ALL-CAPS TITLE WITH 2-4 EMOJIS 🤯🔥 (per YOUTUBE TITLE rules)",
+      "description": "2-3 teasing lines with emojis, then blank line, then 4-6 hashtags",
       "intro_script": "5-8 second spoken hook (1-2 sentences to grab attention)",
       "outro_script": "5-10 second closing thought or context",
       "reason": "why this works as a short (max 20 words)",
@@ -599,6 +610,8 @@ def score_clips(
             reason=sel.get("reason", ""),
             scores=scores,
             score_total=total,
+            youtube_title=sel.get("youtube_title", ""),
+            description=sel.get("description", ""),
         )
         results.append(sc)
 

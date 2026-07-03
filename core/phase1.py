@@ -309,6 +309,8 @@ def run_phase1(
                     "outro_script": sc.outro_script,
                     "reason": sc.reason,
                     "scores": sc.scores,
+                    "youtube_title": sc.youtube_title,
+                    "description": sc.description,
                 },
             }],
             "transcript": clip_segments,

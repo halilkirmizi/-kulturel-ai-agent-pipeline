@@ -32,6 +32,7 @@ log = get_logger(__name__)
 
 # ── Feature declaration ────────────────────────────────────────
 registry.declare("step_tracker", "core", "Execution step gating with persistence")
+registry.declare("demonetization_check", "core", "Estimate demonetization risk before feedback/memory")
 
 
 # ── AOR declarations ─────────────────────────────────────────
@@ -70,6 +71,47 @@ def _run_memory_writer(
     )
     if summary["promoted"] > 0:
         log.info("Memory: %d new entries (dry_run=%s)", summary["promoted"], dry_run)
+
+
+def _run_demonetization_check(clip_dirs, config) -> None:
+    """Estimate demonetization risk for each produced clip.
+
+    Runs after production, before feedback (upload) / memory. Reads the clip's
+    spoken text from state.json and logs a risk report. Informational only —
+    never blocks the pipeline.
+    """
+    import json
+    from analysis.demonetization import assess_demonetization, format_report
+
+    for clip_dir in clip_dirs:
+        sp = Path(clip_dir) / "state.json"
+        if not sp.exists():
+            continue
+        try:
+            d = json.loads(sp.read_text(encoding="utf-8"))
+            clip = (d.get("clips") or [{}])[0]
+            meta = clip.get("metadata", {})
+            start = float(clip.get("start", 0.0))
+            end = float(clip.get("end", 1e12))
+            segs = [s for s in (d.get("transcript") or []) if isinstance(s, dict)]
+
+            def _window(a, b):
+                return " ".join(
+                    s.get("text", "") for s in segs
+                    if a <= float(s.get("start", a)) <= b
+                )
+
+            text = _window(start, end).strip() or " ".join(s.get("text", "") for s in segs)
+            early = _window(start, start + 8.0)
+            title = meta.get("youtube_title", "") or clip.get("hook_text", "")
+
+            result = assess_demonetization(text, title=title, early_text=early,
+                                           has_external_music=False)
+            label = str(Path(clip_dir).name)
+            log.info("%s", format_report(result, label))
+        except Exception as exc:
+            log.warning("  [demonetization] check failed for %s: %s", clip_dir, exc)
+    registry.use("demonetization_check")
 
 
 def main(argv=None) -> None:
@@ -198,6 +240,7 @@ def main(argv=None) -> None:
         try:
             intro_path = Path(args.intro) if args.intro else None
             final = run_phase2(args.resume, config, intro_audio=intro_path, translate=args.translate)
+            _run_demonetization_check([final.parent], config)
             run_upload(final, config)
             tracker.complete(sid, artifacts=[str(final)], notes="Phase 2 render + upload done")
         except PipelineError as exc:
@@ -222,6 +265,7 @@ def main(argv=None) -> None:
             bias = flat_config.get("scoring_bias") if flat_config else None
             results = run_phase1(args.url, config, memory_bias=bias)
             artifacts = [str(r[1]) for r in results]
+            _run_demonetization_check([r[1] for r in results], config)
             tracker.complete(sid, artifacts=artifacts, notes=f"{len(results)} clips produced")
         except PipelineError as exc:
             tracker.fail(sid, reason=str(exc))

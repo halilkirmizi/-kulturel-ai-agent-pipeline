@@ -5,6 +5,28 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-04 (session sonu)
+
+**Trend + ilk analitik podcast pipeline:** FIFA Dünya Kupası 2026 (19 Tem finali) trend belirlendi → kaynak **The Athletic FC Podcast — "Who is winning the World Cup so far?"** (`PYJsZRViYL8`, 40dk). Phase 1 → 2 klip: **clip_1 (Lamin Yamal Scores, 32.0)**, **clip_2 (Cape Verde Shocks Spain, 29.0)**.
+
+**Bug fix (Groq 413):** 40dk podcast skorlama prompt'u 14.3K token → Groq ücretsiz TPM limiti 12K'yı aşıyordu. Çözüm: `LLM_MAX_CHARS=15000` (env, kod değişmeden) → transkript+listing küçülür, prompt ~9K token. Kural: uzun kaynaklarda `LLM_MAX_CHARS` düşür.
+
+**"Cold-open" yaratıcı kurgu (ONE-OFF prototip, pipeline'a ENTEGRE DEĞİL):** Kullanıcı talebiyle haber-tarzı giriş kurgusu ffmpeg ile elle üretildi: gerçek oyuncu/bayrak görseli (Wikimedia CC) arka plan + renkli emoji hook + haber müziği (Chosic) + kullanıcı seslendirmesi (opsiyonel) → yumuşak xfade → altyazılı klip → SUBSCRIBE butonu (PIL, kırmızı pill) → sonda fade-out. **Karar: bunlar pipeline'a default gömülMEZ** — her video farklı, opsiyonel kalır. Bkz. hafıza [[no-hardcoded-creative-treatments]].
+- clip_1: gerçek Yamal fotoğrafı + kullanıcı sesi (1.35x atempo) → `nrCzqdP-BMs` **unlisted** yüklendi (altyazı isim hatası + müzik lisansı beklediği için public değil).
+- clip_2: Cape Verde bayrağı + seslendirmesiz + **whisper `small`** ile yeniden transkript (temiz altyazı) → `final_full.mp4` (36s, hatasız).
+
+**İki gerçek pipeline hatası bulundu + DÜZELTİLDİ (commit + push):**
+1. **Analytics hiç okunamıyordu:** `upload/youtube.py` `_SCOPES` sadece `youtube.upload` → `--fetch-analytics` 403 "insufficient scopes". Tüm öğrenme döngüsü gerçek veri alamıyordu. → **`youtube.readonly` eklendi.** Eski token yedeklendi (`~/.youtube_upload_token.pickle.old_uploadonly_bak`). **Kullanıcı `python main.py --fetch-analytics` ile tarayıcıdan yeniden yetkilendirmeli** (upload+readonly consent).
+2. **Hep unlisted yükleniyordu** (0 izlenme = keşfedilemez). → **`--public` bayrağı** eklendi (default unlisted, scheduled→private).
+
+**Yeni özellik — demonetize-risk kontrolü:** `analysis/demonetization.py` (saf/deterministik). Üretim sonrası, **feedback(upload)/memory ÖNCESİ** çalışır (phase1: klipler sonrası; phase2: render sonrası, upload öncesi). Konuşma+başlığı YouTube reklam-dostu kategorilerine göre tarar → risk 0-1 + LOW/MEDIUM/HIGH + flag'ler. Futbol metaforları (kill/attack/shoot/war) bilinçli hariç → yanlış-pozitif yok. Content ID müzik bayrağı + ilk-8sn küfür boost.
+
+**Test:** `python tests/run_all.py` → **14/14 suite, 196/196 check PASS** (yeni: test_demonetization 18/18, test_upload_meta 24/24).
+**Commit'ler (push edildi):** `bfc5567` (--public + readonly scope), `7bfcede` (demonetization).
+**Açık konular (sonraki oturum):** (1) `--fetch-analytics` re-auth (kullanıcı tarayıcı onayı) → gerçek analytics + öğrenme döngüsü. (2) Yayınlar `--publish-at` ile belirlenen zamanlarda programlı public. (3) Sonraki videolarda `WHISPER_MODEL=small/medium` (isim doğruluğu). (4) clip_1 public'e almadan önce müzik lisansı + altyazı ismi düzelt.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-03 (session sonu)
 
 **İlk tam E2E + yükleme yapıldı:** Haaland WC vlog → 3 Short üretildi + YouTube'a yüklendi (unlisted). Ayrıca Arjantin/Messi klibi (İngilizce çevrili altyazı) yüklendi. Toplam 4 video canlı.

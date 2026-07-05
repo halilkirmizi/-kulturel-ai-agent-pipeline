@@ -1,7 +1,7 @@
 # YouTube Shorts Pipeline — Technical Workflow
 
 > Links: [[kulturel AI agent]] · [[Key Decisions]] · [[SESSION]] · [[CLAUDE]]
-> Güncel: 2026-06-30 (Session 14 — modüler yapı + reframe). Dosya bölünmesi Session 11/12'de yapıldı: `main.py` → `core/phase1|phase2|upload|cli`.
+> Güncel: 2026-07-04 (analytics scope + `--public` + demonetize-risk). Modüler yapı Session 11/12: `main.py` → `core/phase1|phase2|upload|cli`.
 
 ## Pipeline Architecture
 
@@ -38,9 +38,22 @@ Word-level captions (PTS-STARTPTS + -vsync 0)
     │   [editing/overlays.py] hook overlay + subscribe overlay
     │   [editing/audio.py]    intro/ambient audio mix
 FFmpeg composition → final.mp4
+    ↓ [analysis/demonetization.py]  ← ÜRETİM SONRASI, feedback/memory ÖNCESİ
+DEMONETIZATION RISK raporu (LOW/MEDIUM/HIGH) — bilgilendirici, bloklamaz
     ↓ [core/upload.py → upload/youtube.py]
-YouTube Data API v3 OAuth upload (quota tracking)
+YouTube Data API v3 OAuth upload (scope: upload+readonly, quota tracking)
+  • privacy: default unlisted · `--public` → public · `--publish-at`/scheduled → private
 ```
+
+### Demonetize-risk (`analysis/demonetization.py`)
+- Saf/deterministik (LLM yok). Konuşma metni + başlığı YouTube reklam-dostu kategorilerine göre tarar.
+- Kategoriler: hate_slur, profanity_strong/mild, adult_sexual, graphic_violence, sensitive_tragedy, gambling, content_id_music.
+- **Futbol metaforları (kill/attack/shoot/war/death/beat) bilinçli HARİÇ** → yanlış-pozitif yok.
+- İlk ~8sn'de güçlü küfür → ek boost (YouTube "ilk 7 saniye" kuralı). Content ID: `has_external_music=True` ise +0.5.
+- phase1: kliplerden sonra · phase2: render sonrası, upload öncesi çalışır.
+
+### Analytics / öğrenme döngüsü
+- `--fetch-analytics` istatistik okur (`videos.list part=statistics`) → **`youtube.readonly` scope şart** (2026-07-04 eklendi). Scope değiştiği için **re-auth gerekir** (ilk çalıştırmada tarayıcı consent).
 
 ### Orchestration & control katmanı (`core/`)
 

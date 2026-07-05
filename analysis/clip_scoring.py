@@ -73,6 +73,30 @@ def _window_text(segments: list, start: float, end: float) -> str:
     return " ".join(parts)
 
 
+# Generic podcast intro / housekeeping / sponsor / sign-off phrases. Windows whose
+# text contains any of these are poor standalone Shorts — dropped before scoring.
+# High-precision phrases so genuine analysis is not filtered out.
+_INTRO_PATTERNS = (
+    "welcome to the", "welcome back to", "podcast with me", "podcast, with me",
+    "brought to you by", "sponsored by", "in association with",
+    "delivers the latest", "brings you the latest", "my name is",
+    "make sure to subscribe", "hit the subscribe", "like and subscribe",
+    "smash that subscribe", "don't forget to subscribe",
+    "thanks for listening", "thanks for watching", "see you next week",
+    "that's it for today", "that's all for today",
+    "on today's episode", "on this week's episode",
+)
+
+
+def _is_intro_text(text: str) -> bool:
+    """Detect podcast intro / housekeeping / sponsor / sign-off windows.
+
+    Case-insensitive high-precision phrase match so real content is not dropped.
+    """
+    t = (text or "").lower()
+    return any(p in t for p in _INTRO_PATTERNS)
+
+
 def _build_windows(
     segments: list, targets=TARGET_WINS, overlap: float = WIN_OVERLAP
 ) -> List[_Window]:
@@ -128,8 +152,17 @@ def _build_windows(
         idx = sorted({round(i * (len(uniq) - 1) / (MAX_WINDOWS - 1)) for i in range(MAX_WINDOWS)})
         uniq = [uniq[i] for i in idx]
 
-    windows = [_Window(wid=i, start=ss, end=se, text=_window_text(segments, ss, se))
-               for i, (ss, se) in enumerate(uniq)]
+    built = [(ss, se, _window_text(segments, ss, se)) for ss, se in uniq]
+    # Drop generic intro / housekeeping / sponsor windows (weak as Shorts). If they
+    # somehow match everything, keep originals rather than returning an empty set.
+    kept = [(ss, se, t) for ss, se, t in built if not _is_intro_text(t)]
+    if not kept:
+        kept = built
+    dropped = len(built) - len(kept)
+    if dropped:
+        log.info("Dropped %d intro/housekeeping window(s)", dropped)
+
+    windows = [_Window(wid=i, start=ss, end=se, text=t) for i, (ss, se, t) in enumerate(kept)]
     log.info("Built %d windows (targets=%s, overlap=%.0fs)", len(windows), tuple(targets), overlap)
     return windows
 

@@ -19,7 +19,12 @@ from core.logger import get_logger
 log = get_logger(__name__)
 
 # OAuth 2.0 scopes for YouTube Data API v3
-_SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+# - youtube.upload: publish videos
+# - youtube.readonly: read statistics (videos.list part=statistics) for --fetch-analytics
+_SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.readonly",
+]
 _TOKEN_FILE = Path.home() / ".youtube_upload_token.pickle"
 _CLIENT_SECRETS = Path(__file__).resolve().parent / "client_secret.json"
 _QUOTA_FILE = Path(__file__).resolve().parent / ".upload_quota.json"

@@ -21,5 +21,6 @@ upload/.upload_log.json
 # Sensitive credentials
 .env
 upload/client_secret.json
+upload/client_secret*.json
 *.pickle
 *.token

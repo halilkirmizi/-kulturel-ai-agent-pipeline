@@ -160,12 +160,18 @@ def run_upload(final_path: Path, config: PipelineConfig) -> None:
                         config.publish_at)
             publish_at_iso = None
         scheduled = bool(publish_at_iso) or config.schedule_days >= 0
+        if scheduled:
+            privacy = "private"          # scheduled clips go private until publish time
+        elif getattr(config, "public", False):
+            privacy = "public"
+        else:
+            privacy = "unlisted"
         video_id = upload_with_retry(
             str(final_path),
             title=title,
             description=description,
             tags=_build_tags(hook, title),
-            privacy_status="private" if scheduled else "unlisted",
+            privacy_status=privacy,
             schedule_days=config.schedule_days,
             publish_at=publish_at_iso,
             category_id=getattr(config, "video_category_id", "17"),

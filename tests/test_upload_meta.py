@@ -59,6 +59,30 @@ a = parse_args(["url", "--publish-at", "2026-07-04 18:00", "--lang", "en"])
 check("--publish-at parses", a.publish_at == "2026-07-04 18:00")
 check("--lang parses", a.lang == "en")
 
+# ── public / privacy wiring ─────────────────────────────────────────────────
+print("\n[TEST 4] --public / privacy wiring")
+check("default unlisted (public False)", build_config().public is False)
+check("build_config(public=True)", build_config(public=True).public is True)
+check("--public parses True", parse_args(["url", "--public"]).public is True)
+check("no --public parses False", parse_args(["url"]).public is False)
+
+
+def _privacy(scheduled, public):
+    """Mirror of run_upload's privacy selection (kept in sync for regression)."""
+    if scheduled:
+        return "private"
+    return "public" if public else "unlisted"
+
+
+check("scheduled -> private", _privacy(True, True) == "private" and _privacy(True, False) == "private")
+check("public & not scheduled -> public", _privacy(False, True) == "public")
+check("default -> unlisted", _privacy(False, False) == "unlisted")
+
+# youtube read scope present (analytics fix)
+from upload.youtube import _SCOPES
+check("readonly scope present", any("youtube.readonly" in s for s in _SCOPES), str(_SCOPES))
+check("upload scope present", any("youtube.upload" in s for s in _SCOPES))
+
 print("\n" + "=" * 60)
 passed = sum(1 for _, s in results if s == "PASS")
 print(f"RESULT: {passed}/{len(results)} passed")

@@ -93,6 +93,7 @@ def main(argv=None) -> None:
         auto_reframe=args.auto_reframe,
         gpu=args.gpu,
         upload=args.upload,
+        public=args.public,
         schedule_days=args.schedule,
         publish_at=args.publish_at,
         video_language=args.lang,

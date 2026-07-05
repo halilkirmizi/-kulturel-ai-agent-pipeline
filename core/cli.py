@@ -32,6 +32,8 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
     parser.add_argument("--framing", default="crop", choices=["crop", "fit"],
                         help="9:16 framing: 'crop' (default) or 'fit' (full frame on blurred fill, keeps full-width subtitles)")
     parser.add_argument("--upload", action="store_true", help="Upload final video to YouTube")
+    parser.add_argument("--public", action="store_true",
+                        help="Upload as Public (default: unlisted). Ignored when scheduled.")
     parser.add_argument("--schedule", type=int, default=-1, help="Schedule upload N days from now")
     parser.add_argument("--publish-at", default="",
                         help="Schedule public release at exact local time, e.g. \"2026-07-04 12:00\"")

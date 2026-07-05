@@ -157,6 +157,47 @@ def _expand_to_boundaries(start: float, end: float, segments: list) -> Tuple[flo
     return expanded_start, expanded_end
 
 
+# terminal punctuation that ends a sentence (optionally + closing quote/bracket)
+_SENT_END_RE = re.compile(r"""[.!?…]['")\]]?\s*$""")
+
+
+def _ends_sentence(text: str) -> bool:
+    """True if a segment's text ends a sentence (terminal punctuation)."""
+    return bool(_SENT_END_RE.search((text or "").rstrip()))
+
+
+def _snap_to_sentences(start: float, end: float, segments: list) -> Tuple[float, float]:
+    """Snap [start, end] to SENTENCE boundaries so clips don't cut mid-thought.
+
+    Whisper (VAD) segments break ~every 5-6s, usually mid-sentence, so snapping to
+    raw segment bounds (``_expand_to_boundaries``) still starts/ends mid-thought.
+    Here a segment *starts* a sentence when the previous segment ends with terminal
+    punctuation, and *ends* a sentence when its own text does. We pick the clean
+    start nearest the requested start, then the clean end nearest the requested end
+    that keeps the duration within [MIN_CLIP, MAX_CLIP]. Falls back to segment-bound
+    expansion when the transcript has no usable punctuation (never crashes).
+    """
+    if not segments:
+        return start, end
+    segs = sorted(segments, key=lambda s: s.start)
+
+    sent_starts = [s.start for i, s in enumerate(segs)
+                   if i == 0 or _ends_sentence(segs[i - 1].text)]
+    sent_ends = [s.end for s in segs if _ends_sentence(s.text)]
+
+    if not sent_starts or not sent_ends:
+        return _expand_to_boundaries(start, end, segments)
+
+    new_start = min(sent_starts, key=lambda t: abs(t - start))
+    in_range = [t for t in sent_ends if MIN_CLIP <= (t - new_start) <= MAX_CLIP]
+    cand_ends = in_range or [t for t in sent_ends if t > new_start] or sent_ends
+    new_end = min(cand_ends, key=lambda t: abs(t - end))
+
+    if new_end <= new_start:
+        return _expand_to_boundaries(start, end, segments)
+    return new_start, new_end
+
+
 # ── Transcript builders ────────────────────────
 
 
@@ -360,7 +401,7 @@ def _fallback_window_score(win: "_Window", segments: list) -> float:
     Rewards information density (word count), penalises windows that open
     mid-thought, and prefers durations near TARGET_WIN.
     """
-    start, end = _expand_to_boundaries(win.start, win.end, segments)
+    start, end = _snap_to_sentences(win.start, win.end, segments)
     words = sum(len(s.text.split()) for s in segments
                 if s.start >= start and s.end <= end and s.text.strip())
     score = float(words)
@@ -378,7 +419,7 @@ def _fallback_clip(segments: list) -> Optional[ScoredClip]:
 
     best = None  # (score, start, end)
     for w in _build_windows(segments):
-        start, end = _expand_to_boundaries(w.start, w.end, segments)
+        start, end = _snap_to_sentences(w.start, w.end, segments)
         ok, _reason = _validate_clip(start, end, segments)
         if not ok:
             continue
@@ -590,7 +631,7 @@ def score_clips(
             log.warning("Invalid window_id %s, skipping", wid)
             continue
 
-        start, end = _expand_to_boundaries(win.start, win.end, segments)
+        start, end = _snap_to_sentences(win.start, win.end, segments)
 
         ok, reason = _validate_clip(start, end, segments)
         if not ok:

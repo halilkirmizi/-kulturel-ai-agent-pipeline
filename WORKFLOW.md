@@ -1,7 +1,7 @@
 # YouTube Shorts Pipeline — Technical Workflow
 
 > Links: [[kulturel AI agent]] · [[Key Decisions]] · [[SESSION]] · [[CLAUDE]]
-> Güncel: 2026-07-04 (analytics scope + `--public` + demonetize-risk). Modüler yapı Session 11/12: `main.py` → `core/phase1|phase2|upload|cli`.
+> Güncel: 2026-07-05 (klip sınır kalitesi: cümle-snap + intro elemesi). Önceki: analytics scope + `--public` + demonetize-risk (2026-07-04). Modüler yapı Session 11/12.
 
 ## Pipeline Architecture
 
@@ -16,9 +16,12 @@ faster-whisper (GPU CUDA float16, CPU int8 fallback, word-level timestamps)
     ↓ [analysis/topic_detection.py]
 Topic extraction (keywords + named entities)
     ↓ [analysis/clip_scoring.py]
+Aday pencereler kurulur → _is_intro_text() ile podcast intro/housekeeping/sponsor pencereleri ELENIR
+    ↓
 Groq LLaMA 3.3 70B — 4-boyut puanlama:
   • curiosity · emotional_relevance · educational_value · narrative_completeness
     ↓ toplam skora göre sırala → en iyi 3-5 klip
+    ↓ _snap_to_sentences(): klip başı/sonu CÜMLE sınırına (. ! ?) snap'lenir (yarıda kesmez)
     ↓ [editing/render_core.py → build_crop_command]
     │   (opsiyonel) [analysis/reframe.py → detect_crop_x]  ← --auto-reframe
 FFmpeg crop 9:16 (1080x1920, PTS-STARTPTS reset, setsar=1)

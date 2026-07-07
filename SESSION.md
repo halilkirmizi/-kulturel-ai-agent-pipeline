@@ -5,6 +5,29 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-05 (session sonu — klip kalitesi fix'leri)
+
+**Yeni video:** The Athletic FC — *"Why have Germany lost their World Cup aura?"* (`RtfvglX7hiM`, 44dk). `WHISPER_MODEL=small` + `LLM_MAX_CHARS=15000` ile çalıştırıldı. Demonetize-risk otomatik çalıştı (hepsi LOW).
+
+**Kullanıcı geri bildirimi → 2 klip-kalitesi bug'ı bulundu ve KALICI ÇÖZÜLDÜ (commit+push+test):**
+
+1. **Cümleler yarıda kesiliyordu** (klip "play and actually..." ile başlayıp "...over the last" ile kesiliyordu). Kök neden: pencereler whisper VAD segment sınırına (~5-6sn, cümle ortası) snap'leniyordu; `_opens_mid_thought` sadece yumuşak START ipucuydu, END'i hiç kontrol etmiyordu.
+   - **Fix `f3ceb7d`:** `_snap_to_sentences()` — seçilen klip başı/sonu NOKTALAMA tabanlı cümle sınırına snap'lenir (start = önceki segment `. ! ?` ile bitince; end = kendisi `. ! ?` ile biten segment; süre [12,35] içinde). Noktalama yoksa `_expand_to_boundaries`'e güvenli fallback. 3 finalizasyon call-site değişti.
+
+2. **LLM ısrarla podcast açılışını seçiyordu** (0-18sn "Hello and welcome to the Athletic FC podcast with me..."). Yeniden-seçtirmek çözmüyordu.
+   - **Fix `d341355`:** `_is_intro_text()` — yüksek-hassasiyetli kalıp eşlemesi (welcome to the, podcast with me, brought to you by, delivers the latest, subscribe, thanks for listening, my name is...). `_build_windows` bu pencereleri skorlamaya girmeden eler; hepsi eşleşirse orijinali korur.
+
+**Doğrulama (gerçek re-run):** intro elendi ("Dropped 2 intro/housekeeping window(s)"), iki klip de gerçek içerik + temiz cümle sınırları (clip_1 UEFA's Bad Night skor 32, clip_2 Royal Rumble skor 29).
+**Test:** `tests/run_all.py` → **16/16 suite, 219/219 check PASS** (yeni: test_sentence_snap 13/13, test_intro_filter 10/10).
+
+**Hâlâ AÇIK konular:**
+- **Sorun 2 — footage:** Kaynak stüdyo talking-head podcast'i, arkada maç görüntüsü yok. İki yol: (A) görüntülü kaynak seç (highlight/reaction), (B) b-roll bindirme sistemi (büyük iş + lisans). Kullanıcı henüz seçmedi.
+- **İnce:** dolgulu ama gramatik açılış cümleleri ("But yeah, so hopefully...") hâlâ geçebilir (zayıf hook, ayrı konu).
+- Germany klipleri Phase 2 bekliyor (intro sesi gerekir; cold-open/seslendirmesiz seçenek var).
+- (Önceki oturumdan) `--fetch-analytics` re-auth (kullanıcı tarayıcı consent), publish-at ile programlı yayın, clip_1 (Yamal) müzik lisansı+altyazı ismi düzeltilmeden public yapılmaz.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-04 (session sonu)
 
 **Trend + ilk analitik podcast pipeline:** FIFA Dünya Kupası 2026 (19 Tem finali) trend belirlendi → kaynak **The Athletic FC Podcast — "Who is winning the World Cup so far?"** (`PYJsZRViYL8`, 40dk). Phase 1 → 2 klip: **clip_1 (Lamin Yamal Scores, 32.0)**, **clip_2 (Cape Verde Shocks Spain, 29.0)**.

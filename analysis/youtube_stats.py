@@ -19,22 +19,19 @@ log = get_logger(__name__)
 
 
 def _default_service():
-    """Reuse the upload OAuth credentials to build a read-only YouTube client.
+    """Build a YouTube client via the shared upload OAuth flow.
+
+    Reuses ``upload.youtube._get_authenticated_service`` so stats fetching
+    benefits from the same token refresh, scope-subset check, and (when the
+    cached token lacks the readonly scope) browser re-consent. This is the
+    only way --fetch-analytics can re-authenticate.
 
     Returns None (caller degrades gracefully) if anything is unavailable.
     """
     try:
-        import pickle
-        from pathlib import Path
-        from googleapiclient.discovery import build
+        from upload.youtube import _get_authenticated_service
 
-        token = Path.home() / ".youtube_upload_token.pickle"
-        if not token.exists():
-            log.warning("[analytics] no OAuth token — skipping stats fetch")
-            return None
-        with open(token, "rb") as f:
-            creds = pickle.load(f)
-        return build("youtube", "v3", credentials=creds)
+        return _get_authenticated_service()
     except Exception as exc:
         log.warning("[analytics] could not build YouTube client: %s", exc)
         return None

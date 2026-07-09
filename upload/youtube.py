@@ -63,6 +63,19 @@ def _get_authenticated_service():
         except Exception:
             creds = None
 
+    # Force re-auth if the cached token is missing any required scope.
+    # A refresh_token keeps whatever scopes it was granted, so an old
+    # upload-only token (predating youtube.readonly) would otherwise refresh
+    # forever and never gain read access — silently 403-ing --fetch-analytics.
+    if creds is not None:
+        granted = set(getattr(creds, "scopes", None) or [])
+        if not set(_SCOPES).issubset(granted):
+            log.info(
+                "Cached token missing required scope(s) %s (has %s) — re-authenticating",
+                sorted(set(_SCOPES) - granted), sorted(granted),
+            )
+            creds = None
+
     # Refresh or re-auth
     if creds and creds.expired and creds.refresh_token:
         try:

@@ -100,6 +100,9 @@ class PipelineConfig:
     whisper_model: str = "base"
     whisper_device: str = "cuda"
     whisper_compute: str = "float16"
+    # "transcribe" = source language; "translate" = Whisper translates any
+    # source language directly to English (used for non-English sources).
+    whisper_task: str = "transcribe"
 
     # LLM
     groq_api_key: str = ""
@@ -219,6 +222,7 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         whisper_model=os.getenv("WHISPER_MODEL", "base"),
         whisper_device="cuda" if os.getenv("CUDA_VISIBLE_DEVICES", "") != "-1" else "cpu",
         whisper_compute="float16" if os.getenv("CUDA_VISIBLE_DEVICES", "") != "-1" else "int8",
+        whisper_task=os.getenv("WHISPER_TASK", "transcribe"),
         # LLM
         groq_api_key=overrides.get("groq_api_key") or os.getenv("GROQ_API_KEY", ""),
         groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),

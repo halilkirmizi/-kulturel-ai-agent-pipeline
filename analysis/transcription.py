@@ -106,6 +106,7 @@ def transcribe(
     try:
         segments, info = model.transcribe(
             video_path,
+            task=config.whisper_task,
             beam_size=config.whisper.beam_size,
             word_timestamps=True,
             vad_filter=config.whisper.vad_filter,
@@ -124,7 +125,7 @@ def transcribe(
                 compute_type="int8",
                 cpu_threads=4,
             )
-            segments, info = model.transcribe(video_path, beam_size=5, word_timestamps=True)
+            segments, info = model.transcribe(video_path, task=config.whisper_task, beam_size=5, word_timestamps=True)
         else:
             log.error("Whisper transcription failed: %s", exc)
             raise

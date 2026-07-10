@@ -1,7 +1,7 @@
 # YouTube Shorts Pipeline — Technical Workflow
 
 > Links: [[kulturel AI agent]] · [[Key Decisions]] · [[SESSION]] · [[CLAUDE]]
-> Güncel: 2026-07-05 (klip sınır kalitesi: cümle-snap + intro elemesi). Önceki: analytics scope + `--public` + demonetize-risk (2026-07-04). Modüler yapı Session 11/12.
+> Güncel: 2026-07-10 (analytics re-auth GERÇEK VERİ + `WHISPER_TASK=translate` FR→EN + ilk public Short'lar). Önceki: klip sınır kalitesi cümle-snap + intro elemesi (2026-07-05). Modüler yapı Session 11/12.
 
 ## Pipeline Architecture
 
@@ -13,6 +13,8 @@ YouTube URL
 yt-dlp (bestvideo+bestaudio, MP4 merge, deterministic video ID binding)
     ↓ [analysis/transcription.py]
 faster-whisper (GPU CUDA float16, CPU int8 fallback, word-level timestamps)
+    │   WHISPER_MODEL=small/medium (isim doğruluğu) · WHISPER_TASK=translate (non-EN kaynağı doğrudan EN'e çevir)
+    │   NOT: medium 6GB GPU'da çöker → CUDA_VISIBLE_DEVICES=-1 (CPU whisper) + --no-gpu (CPU encode) birlikte
     ↓ [analysis/topic_detection.py]
 Topic extraction (keywords + named entities)
     ↓ [analysis/clip_scoring.py]
@@ -55,8 +57,10 @@ YouTube Data API v3 OAuth upload (scope: upload+readonly, quota tracking)
 - İlk ~8sn'de güçlü küfür → ek boost (YouTube "ilk 7 saniye" kuralı). Content ID: `has_external_music=True` ise +0.5.
 - phase1: kliplerden sonra · phase2: render sonrası, upload öncesi çalışır.
 
-### Analytics / öğrenme döngüsü
-- `--fetch-analytics` istatistik okur (`videos.list part=statistics`) → **`youtube.readonly` scope şart** (2026-07-04 eklendi). Scope değiştiği için **re-auth gerekir** (ilk çalıştırmada tarayıcı consent).
+### Analytics / öğrenme döngüsü — ARTIK ÇALIŞIYOR (2026-07-10)
+- `--fetch-analytics` istatistik okur (`videos.list part=statistics`) → **`youtube.readonly` scope şart**.
+- **Re-auth fix (2026-07-10):** `youtube.py` artık cached token'da eksik scope varsa creds'i atıp tarayıcı consent'i tetikler (eski upload-only token refresh'te scope'u koruyup re-auth'u atlıyordu); `youtube_stats._default_service` de `_get_authenticated_service()` üzerinden gider. Bu iki fix olmadan re-auth imkansızdı.
+- **Döngü gerçek veriyle kapandı:** upload→provenance → `--fetch-analytics` (gerçek views) → `compute_performance_score` → `--propose-weights` (weights_vN) → `--apply-weights`. İlk güvenilir öneri `weights_v2` (5 örnek). Feature_lift için feature varyasyonlu upload gerekir (şu an hepsi aynı).
 
 ### Orchestration & control katmanı (`core/`)
 
@@ -109,7 +113,7 @@ CUDA kullanan her modül cublas/cuda RuntimeError'ı yakalar ve CPU'da retry ede
 | `analysis/transcription.py` | 163 | Whisper GPU/CPU |
 | `analysis/topic_detection.py` | 47 | Keyword/entity çıkarımı |
 | `analysis/clip_scoring.py` | 461 | LLM 4-boyut puanlama |
-| `analysis/translation.py` | 52 | Caption çeviri (es→en) |
+| `analysis/translation.py` | 52 | Caption çeviri LLM (es→en). Non-EN için tercih: `WHISPER_TASK=translate` (Whisper her dili EN'e çevirir) |
 | `analysis/reframe.py` | 128 | Yüz takipli crop_x (opt-in) |
 | `editing/render_core.py` | 131 | Crop + compose komut üreticileri (saf) |
 | `editing/captions.py` | 105 | Word-level caption |
@@ -123,4 +127,20 @@ CUDA kullanan her modül cublas/cuda RuntimeError'ı yakalar ve CPU'da retry ede
 ```bash
 python main.py <youtube_url> [--auto-reframe] [--mode adaptive_mode] [--no-captions] [--upload] [--trace-arbiter]
 python main.py --resume short_XXX/clip_1 --upload   # Phase 2'den devam
+
+# Non-EN kaynak → İngilizce altyazı (Whisper translate)
+WHISPER_TASK=translate WHISPER_MODEL=small python main.py <link>
+# medium kalite (GPU çöker → tam CPU): whisper CPU + encode CPU
+CUDA_VISIBLE_DEVICES=-1 WHISPER_TASK=translate WHISPER_MODEL=medium python main.py <link> --no-gpu
+
+# Yayın: hemen public / N saat sonra programlı public
+python main.py --resume short_XXX/clip_1 --upload --public
+python main.py --resume short_XXX/clip_2 --upload --publish-at "2026-07-10 20:39"
+
+# Analytics (ilk sefer tarayıcı re-auth: upload+readonly consent)
+python main.py --fetch-analytics && python main.py --propose-weights
 ```
+
+### AI intro sesi + center stamp (one-off, opt-in)
+- AI intro: `python -m edge_tts --voice en-US-GuyNeural --rate=+8% --text "<intro_script>" --write-media <clip_dir>/intro.mp3` → Phase 2 kullanır.
+- Center stamp: ffmpeg `drawtext` (Impact, ortada). Font-path colon gotcha → font'u klip dizinine kopyala, göreli yolla ver. Orijinali `final_nostamp.mp4`'e yedekle, stamp'li → `final.mp4`.

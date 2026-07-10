@@ -5,6 +5,41 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-10 (analytics re-auth + öğrenme döngüsü GERÇEK VERİ + FR→EN + İLK PUBLIC Short'lar)
+
+**1) Analytics re-auth ARTIK ÇALIŞIYOR — 2 gerçek fix (commit+push `9ffe999`):**
+- Kök sorun: eski upload-only token refresh edilince eski scope korunuyor → `youtube.py` re-auth'u atlıyordu. Ayrıca `--fetch-analytics`, `youtube_stats._default_service` üzerinden pickle'ı DOĞRUDAN okuyup re-auth akışını hiç çağırmıyordu → readonly consent İMKANSIZDI (SESSION-07-04 notundaki "sadece --fetch-analytics çalıştır" talimatı yanlıştı).
+- Fix 1 `upload/youtube.py`: **scope-subset kontrolü** — cached token gerekli scope'lardan birini içermiyorsa creds atılır, tam re-auth (tarayıcı consent) tetiklenir.
+- Fix 2 `analysis/youtube_stats.py`: `_default_service` artık `_get_authenticated_service()` üzerinden gider (refresh + scope-check + consent tek yerde).
+- **Sonuç:** re-auth tamamlandı (upload+readonly). 6 videodan **5'i gerçek stats aldı** (avg perf 0.0971; Yamal `nrCzqdP-BMs` 11 view en yüksek). 1 video (`oK2Jx8Vx4TU`) stats dönmedi (silinmiş/erişilemez olabilir).
+- **Öğrenme döngüsü GERÇEK VERİYLE kapandı:** `--propose-weights` → ilk **güvenilir** `weights_v2` (curiosity 1.023, educational 1.022, emotional 0.997; feature_lift None çünkü tüm videoların feature'ı aynı). `load_latest_weights` v2'yi alıyor → `--apply-weights` çalışır. UYARI: sinyal zayıf/yanlı (hepsi unlisted 0-11 view; Yamal ekstra prodüksiyondan).
+
+**2) Germany klipleri İPTAL:** Kullanıcı "tarihi geçti, izlenmez" dedi (RtfvglX7hiM batch'i ölü). Ders → hafıza [[kulturel-shorts-shelf-life]]: haber/trend Short'ları AYNI GÜN yayınla yoksa bayatlar.
+
+**3) Fransızca→İngilizce — yeni özellik `WHISPER_TASK=translate` (commit+push `c1122b4`):**
+- `core/config.py` `whisper_task` (env, default "transcribe") + `analysis/transcription.py` `task=config.whisper_task`. Whisper herhangi bir dili DOĞRUDAN İngilizce'ye çevirir (zamanlama korunur, isimler düzelir). Eski `translate_segments` sadece es→en (İspanyolca prompt) idi.
+- Kaynak: MadeinFOOT `-zbKCSIe_Sw` (Mbappé'nin France 2-0 Morocco sonrası konuşması, FR, **bugün yüklendi, 241k view**). small-GPU translate → temiz İngilizce ama 1 klipte "world champion" garble; **medium-CPU translate → 2 temiz klip** (garble klibi otomatik düştü).
+- **GPU/CPU gotcha:** whisper **medium 6GB GPU'da çöküyor** → `CUDA_VISIBLE_DEVICES=-1` (CPU whisper) gerekli; o da NVENC encode'u kırıyor → `--no-gpu` ile BİRLİKTE kullan. İki lever ayrı (biri whisper, biri encode).
+
+**4) AI intro sesi + center stamp (one-off, opt-in — [[no-hardcoded-creative-treatments]]):**
+- Kullanıcı kendi sesi yerine **AI ses** istedi → `edge-tts` (GuyNeural) ile intro_script → `intro.mp3`. Phase 2 intro'yu zorunlu kılıyor; AI ses bu ihtiyacı karşıladı (mikrofon açmadan).
+- ffmpeg drawtext ile **ekran ortasına Impact büyük kelime stamp'i** (clip_1 "DISCIPLINE", clip_2 "PASSION!"). Gotcha: font-path'teki `C:` iki noktası ffmpeg filtre parser'ını bozar → font'u klip dizinine kopyalayıp GÖRELİ yolla çöz.
+
+**5) İLK PUBLIC Short'lar yüklendi (18:39 CEST):**
+- clip_1 (DISCIPLINE / "FEAR DOESN'T WIN MATCHES") → **`K8hKbAEGh8k` PUBLIC — canlı**.
+- clip_2 (PASSION! / "PASSION DRIVES SUCCESS") → **`iTUo-J_4nPE`, 2026-07-10 20:39'a scheduled public** (`--publish-at`, o ana kadar private).
+- İkisi de demonetize LOW, provenance kaydedildi. Not: upload `final.mp4`'ü yüklüyor → stamp'li versiyonu `final.mp4` yapıp orijinali `final_nostamp.mp4`'e yedekledik.
+
+**Test:** `tests/run_all.py` → **16/16 suite, 219/219 PASS** (her iki commit'te).
+
+**Açık konular / next:**
+- Footage kararı (A talking-head kabul / B b-roll) hâlâ ertelendi.
+- **Whisper GPU→CPU otomatik fallback + `--no-gpu` transkripti de kapsasın** (medium-GPU crash + flag decoupling düzeltilsin).
+- Birkaç gün sonra `--fetch-analytics` → `K8hKbAEGh8k` + `iTUo-J_4nPE` gerçek stats → `--propose-weights`/`--apply-weights` daha anlamlı.
+- ESPN kaynağı `Bdf7whnn11I` klipleri de mevcut (`short_20260710_004954` small + `_110753`); istenirse 3. Short için hazır.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-05 (session sonu — klip kalitesi fix'leri)
 
 **Yeni video:** The Athletic FC — *"Why have Germany lost their World Cup aura?"* (`RtfvglX7hiM`, 44dk). `WHISPER_MODEL=small` + `LLM_MAX_CHARS=15000` ile çalıştırıldı. Demonetize-risk otomatik çalıştı (hepsi LOW).

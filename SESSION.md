@@ -23,6 +23,9 @@ python main.py --news-trend --upload   # otomatik trend → 12/18 programlı pub
 TREND_WINDOW_HOURS=24 python main.py --news-trend   # daha dar taze pencere
 ```
 
+**3) İLK CANLI `--news-trend` UÇTAN UCA + PUBLIC upload:** Kullanıcı "bugün video paylaşalım" dedi. `--news-trend` önizleme render'ı → trend detector **Spain vs France yarı final** hikayesini seçti (Yamal vs Mbappé, güçlü hook, trajedi/spor-dışı değil). Çıktı: 18.43s, 9MB, demonetize LOW, "Spain Ready to Take Down France? 🏆💥". Kullanıcı önizlemeyi gördü → **hemen public** istedi (peak-slot kuralını bilerek çiğnedi; akşam 19:46, her iki slot geçmişti). **`WgROqWJWJhw` PUBLIC — canlı.**
+- ⚠️ **Kod gap'i:** `news_mode.run_news` upload'ı HER ZAMAN `next_publish_slot()` ile programlıyor — `--public`/hemen-public yolu yok. Bu yüzden mevcut `final.mp4`'ü `upload_video(privacy_status="public", publish_at=None)` ile DOĞRUDAN yükledim (news akışı dışında). İleride: news moduna `--public`/`--publish-now` desteği bağla.
+
 **Açık / sonraki adımlar:** Cron tam otomatik (günde 1-2 `--news-trend --upload`, peak saate) · b-roll kalitesi (jenerik stok query havuzu) · trend seçimini provenance/öğrenme döngüsüne bağla · birkaç gün sonra `--fetch-analytics` → `xVaQLTb1zAc` gerçek stats.
 
 ---

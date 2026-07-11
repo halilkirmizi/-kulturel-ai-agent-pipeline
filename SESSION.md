@@ -5,6 +5,46 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-11 (STRATEJİ DÖNÜŞÜ: faceless futbol HABER modu + retention teşhisi)
+
+**Büyük karar: kanal klip-çıkarma'dan FACELESS FUTBOL HABER formatına döndü.** Sebep gerçek veri.
+
+**Retention teşhisi (analytics ekranı):**
+- Klip-çıkarma / talking-head Short'ları **çöküyor**: örn. Lamin Yamal videosu = **78 gösterim, 5sn ortalama izlenme, %0.1**. YouTube küçük bir gruba gösterip retention düşük olunca dağıtımı kesiyor → 0 izlenme. Unlisted değil, PUBLIC'ti — sorun keşif değil, **retention (ilk 1-5 saniye tutmuyor)**.
+- Aynı kanaldaki **CIA/whistleblower içeriği TUTUYOR**: 1000+ izlenme, %22-29 retention. Yani kanal itilebiliyor; talking-head futbol formatı yanlıştı.
+- Ek sorun: sansasyonel başlık ("...DEBUT GOAL") görsel vaat ediyor ama talking-head gol göstermiyor → izleyici 5sn'de kaçıyor.
+
+**Prototip süreci:**
+- İlk deneme: statik foto slayt gösterisi → kullanıcı **reddetti** ("kimse izlemez").
+- Kullanıcı yönü: telif-güvenli (demonetize yok) futbol HABER, AI/kendi sesi, ön planda video+foto, ilgi çekici.
+- Kazanan format: **haber metni + AI ses + hızlı-kesme hareketli stok video + oyuncu fotoları + kinetik altyazı + müzik** → kullanıcı **onayladı**.
+
+**Demonetize netliği (kullanıcıya):**
+- Maç VİDEO footage = Content ID = demonetize ❌ · Getty/basın "o an" fotosu = telif riski ⚠️ · **CC oyuncu fotosu (Wikimedia) = GÜVENLİ ✅** · özgün metin = reused-content değil ✅ · **AI ses tek başına flag'lemez**.
+
+**Yeni özellik: `--news` TAM OTOMATİK modu (commit+push `f566ef8`):**
+- `python main.py --news "<konu>"` → LLM özgün metin → edge-tts ses+VTT → Pixabay video (etiket-filtreli+dedup) + Wikimedia foto (redirect+thumbnail fallback) → hızlı-kesme kinetik-altyazılı montaj → demonetize kontrolü → `--upload` ile **peak-saate (12/18) programlı** upload.
+- **Mimari (main.py şişmesin):** `analysis/news_script.py` · `analysis/stock_media.py` · `analysis/tts.py` · `editing/montage.py` · `core/news_mode.py` (+`next_publish_slot()`) · main.py ~8 satır route · config `pixabay_api_key` · `ffmpeg_builder.execute(cwd=)` (Windows colon-path).
+- **Pixabay anahtarı `.env`'de** (PIXABAY_API_KEY, gitignored). Kullanıcı sağladı.
+- E2E doğrulandı: France 2-0 Morocco → 18.96s, 10 görsel, Mbappe+Dembele foto + filtreli b-roll, demonetize LOW. **Test 219/219 PASS.**
+
+**Yayın kuralı (kesinleşti):** her video **12:00 veya 18:00** (İsviçre) — ölü saatte public YOK. Hep `--publish-at`/next_publish_slot. (Bugün 06:00'da yanlışlıkla public yaptım → `videos.update` scope yetersiz olduğu için Studio'dan düzeltildi.)
+
+**Bugün yüklenen/programlanan:**
+- `K8hKbAEGh8k` (DISCIPLINE / Mbappé konuşma klibi) — public (2026-07-10).
+- `iTUo-J_4nPE` (PASSION! klibi) — 2026-07-10 20:39 scheduled.
+- `u0aAeEUzuao` (AI-intro+stamp "France UNSTOPPABLE") — Studio'dan 12:00'a alındı.
+- **`wFJm_N_g3yI` (haber formatı "FRANCE REACH SEMIS!") — 2026-07-11 12:00 scheduled.** ⚠️ u0aAeEUzuao ile aynı slot; kullanıcı eskisini 18:00/unlisted yapacak (haber formatı tercih edildi).
+
+**Açık / sonraki adımlar:**
+1. **Trend otomatik tespiti** — konu şu an manuel; "bugünün futbol haberi"ni otomatik bulmak (WebSearch/RSS).
+2. **Cron / zamanlanmış** tam otomatik (günde 1-2 news, `--publish-at` peak).
+3. Altyazı kelime-vurgu animasyonu (retention+); news video'ları provenance/öğrenme döngüsüne bağla.
+4. Ufak: "foosball" gibi kenar durum için tag-filtre biraz daha sıkı.
+5. Eski klip-çıkarma pipeline'ı duruyor (bozulmadı) ama kanal yönü artık HABER.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-10 (analytics re-auth + öğrenme döngüsü GERÇEK VERİ + FR→EN + İLK PUBLIC Short'lar)
 
 **1) Analytics re-auth ARTIK ÇALIŞIYOR — 2 gerçek fix (commit+push `9ffe999`):**

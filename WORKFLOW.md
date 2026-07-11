@@ -62,6 +62,25 @@ YouTube Data API v3 OAuth upload (scope: upload+readonly, quota tracking)
 - **Re-auth fix (2026-07-10):** `youtube.py` artık cached token'da eksik scope varsa creds'i atıp tarayıcı consent'i tetikler (eski upload-only token refresh'te scope'u koruyup re-auth'u atlıyordu); `youtube_stats._default_service` de `_get_authenticated_service()` üzerinden gider. Bu iki fix olmadan re-auth imkansızdı.
 - **Döngü gerçek veriyle kapandı:** upload→provenance → `--fetch-analytics` (gerçek views) → `compute_performance_score` → `--propose-weights` (weights_vN) → `--apply-weights`. İlk güvenilir öneri `weights_v2` (5 örnek). Feature_lift için feature varyasyonlu upload gerekir (şu an hepsi aynı).
 
+### Faceless HABER modu (`--news`) — YENİ ANA YÖN (2026-07-11)
+
+Klip-çıkarmadan AYRI akış (indirme/whisper/skorlama yok). Kanal, talking-head klip
+Short'ları retention'da çöktüğü için (5sn izlenme, %0.1) bu formata döndü.
+
+```
+python main.py --news "<konu>" [--upload]
+    ↓ [analysis/news_script.py]  Groq LLM → özgün metin (60-80 kelime, min-retry) + görsel planı + başlık/etiket
+    ↓ [analysis/tts.py]          edge-tts (GuyNeural) → voice.mp3 + voice.vtt (kelime-zamanlı)
+    ↓ [analysis/stock_media.py]  Pixabay video (tag-relevance gate + dedup) + Wikimedia foto (redirect+thumbnail)
+    ↓ [editing/montage.py]       segment render (video cover-crop / foto Ken-Burns) → concat → ASS kinetik altyazı → ses+müzik miks
+    ↓ [analysis/demonetization.py]  risk raporu (özgün metin + CC/stok → LOW)
+    ↓ [core/news_mode.py → upload/youtube.py]  next_publish_slot() (12:00/18:00) ile --publish-at programlı public
+```
+- **Demonetize-güvenli:** özgün metin (reused-content değil) + telif-güvenli Pixabay + CC Wikimedia (Content ID yok). AI ses tek başına flag'lemez.
+- **Gerekli:** `.env` → `PIXABAY_API_KEY`. Music: `assets/music/`.
+- **Relevance filtresi:** tag'de "soccer"/"football" şart + reject listesi (konser/okyanus/tenis/CGI/american football eler) + görülmüş-ID dedup.
+- **main.py:** ~8 satır route; mantık ayrı modüllerde; altyapı (config/logger/demonetization/upload/ffmpeg_builder) ortak.
+
 ### Orchestration & control katmanı (`core/`)
 
 | Modül | Rol |

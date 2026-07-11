@@ -8,6 +8,7 @@ reused-content demonetization policy.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any, Dict
 
 from core.logger import get_logger
@@ -73,7 +74,15 @@ def generate_news_script(topic: str, config) -> Dict[str, Any]:
     except Exception as exc:
         raise RuntimeError(f"news script generation failed: {exc}")
 
-    # ---- validate / normalize ----
+    return _validate_script(data, fallback_title=topic)
+
+
+def _validate_script(data: Dict[str, Any], fallback_title: str = "") -> Dict[str, Any]:
+    """Validate/normalize a script dict (from the LLM or a hand-written file).
+
+    Enforces the same contract for both paths: non-empty narration, >=4 valid
+    visuals, capped metadata. Raises RuntimeError on a malformed script.
+    """
     narration = (data.get("narration") or "").strip()
     visuals = data.get("visuals") or []
     if not narration or not visuals:
@@ -92,10 +101,29 @@ def generate_news_script(topic: str, config) -> Dict[str, Any]:
     out = {
         "narration": narration,
         "visuals": clean_visuals,
-        "title": (data.get("title") or topic).strip()[:100],
+        "title": (data.get("title") or fallback_title).strip()[:100],
         "description": (data.get("description") or "").strip()[:5000],
         "tags": [str(t).strip() for t in (data.get("tags") or []) if str(t).strip()][:10],
     }
     log.info("[news] script: %d words, %d visuals, title=%r",
              len(narration.split()), len(clean_visuals), out["title"][:50])
     return out
+
+
+def load_news_script(path: str) -> Dict[str, Any]:
+    """Load a hand-written news script JSON (bring-your-own-script path).
+
+    Same shape and validation as ``generate_news_script`` output, so the montage
+    pipeline treats an authored script identically to an LLM-generated one. Lets
+    the operator condense a source article to an exact length instead of relying
+    on the LLM's ~20-25s target.
+    """
+    p = Path(path)
+    if not p.exists():
+        raise RuntimeError(f"news script file not found: {p}")
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise RuntimeError(f"could not parse news script {p}: {exc}")
+    log.info("[news] loaded authored script from %s", p.name)
+    return _validate_script(data, fallback_title=p.stem)

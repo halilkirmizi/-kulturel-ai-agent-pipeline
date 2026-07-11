@@ -142,13 +142,15 @@ def main(argv=None) -> None:
         no_captions=args.no_captions,
         karaoke=args.karaoke,
         trim_silence=args.trim_silence,
+        news_script_path=args.news_script,
     )
 
     # News mode — separate flow (topic → script → voice → stock media → montage → upload).
     # Does not touch the clip-extraction pipeline (no download/whisper/scoring).
-    if args.news:
+    # Triggered by --news (topic) or --news-script (authored script file).
+    if args.news_script or args.news is not None:
         from core.news_mode import run_news
-        run_news(args.news, config)
+        run_news(args.news or "", config)
         return
 
     AOR.register_read("format_config", f"formats/{args.format}.json", __name__)

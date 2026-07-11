@@ -5,6 +5,21 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-11 #2 (bring-your-own-script `--news-script` + Haaland Short yayında)
+
+**Yeni özellik: `--news-script <path>` (commit bekliyor) — hazır metin besleme.**
+- Kullanıcı elinde bir kaynak makale/metin ile geldi ("bunu 15-20sn shorts scriptine çevir + kurgula"). `--news` konudan LLM ile ~60-80 kelime (~25sn) üretir → kullanıcının istediği 15-20sn'lik KESİN uzunluk için uymuyordu.
+- Çözüm: **bring-your-own-script** yolu. LLM yerine elle yazılmış `script.json` yüklenir; aynı şema + aynı doğrulama (montaj onu LLM çıktısıyla ÖZDEŞ işler). Operatör kaynak makaleyi tam istediği uzunlukta kısaltır.
+- **Mimari (minimal, main.py şişmedi):** `news_script.py` → doğrulama `_validate_script()`'e ayrıldı + `load_news_script(path)` eklendi. `news_mode.run_news` → `config.news_script_path` doluysa dosyadan yükler, yoksa eski LLM yolu. `config.news_script_path` alanı + `--news-script` CLI (`--news` artık `nargs="?"`; ikisinden biri news modunu tetikler).
+- **Doğrulama:** Haaland/Norveç metni → `news_scripts/haaland_brazil.json` (53 kelime, 9 görsel). E2E render: **20.0s**, 1080x1920, 9.7MB, demonetize LOW. Kareler kontrol edildi: açılış havadan saha, gerçek Haaland/Mbappé/Messi fotoları, "2-1" altyazıda + TTS'te doğru. **Test 219/219 PASS.**
+
+**Yayınlandı (kullanıcı "paylaşalım" dedi):**
+- **`xVaQLTb1zAc`** ("Haaland STUNS Brazil — Norway's First-Ever World Cup Quarter-Final!") → **2026-07-11 18:00 (İsviçre) scheduled public.** Provenance kaydedildi. Maç sonucu → aynı gün yayın ([[kulturel-shorts-shelf-life]]).
+
+**Açık / sonraki adımlar:** (öncekiyle aynı) trend otomatik tespiti · cron tam otomatik · b-roll kalitesi (jenerik stok; "soccer fans crowd" query'si amatör saha getiriyor, daha iyi query havuzu) · birkaç gün sonra `--fetch-analytics` → `xVaQLTb1zAc` gerçek stats.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-11 (STRATEJİ DÖNÜŞÜ: faceless futbol HABER modu + retention teşhisi)
 
 **Büyük karar: kanal klip-çıkarma'dan FACELESS FUTBOL HABER formatına döndü.** Sebep gerçek veri.

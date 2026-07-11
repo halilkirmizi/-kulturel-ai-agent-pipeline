@@ -1,7 +1,7 @@
 # YouTube Shorts Pipeline — Technical Workflow
 
 > Links: [[kulturel AI agent]] · [[Key Decisions]] · [[SESSION]] · [[CLAUDE]]
-> Güncel: 2026-07-10 (analytics re-auth GERÇEK VERİ + `WHISPER_TASK=translate` FR→EN + ilk public Short'lar). Önceki: klip sınır kalitesi cümle-snap + intro elemesi (2026-07-05). Modüler yapı Session 11/12.
+> Güncel: 2026-07-11 (`--news` faceless HABER modu + `--news-script` bring-your-own-script). Önceki: analytics re-auth GERÇEK VERİ + `WHISPER_TASK=translate` (2026-07-10). Modüler yapı Session 11/12.
 
 ## Pipeline Architecture
 
@@ -68,8 +68,10 @@ Klip-çıkarmadan AYRI akış (indirme/whisper/skorlama yok). Kanal, talking-hea
 Short'ları retention'da çöktüğü için (5sn izlenme, %0.1) bu formata döndü.
 
 ```
-python main.py --news "<konu>" [--upload]
+python main.py --news "<konu>" [--upload]                    # LLM metin
+python main.py --news-script news_scripts/<x>.json [--upload]  # elle metin (bring-your-own-script)
     ↓ [analysis/news_script.py]  Groq LLM → özgün metin (60-80 kelime, min-retry) + görsel planı + başlık/etiket
+    │   VEYA `load_news_script(path)` → elle yazılmış script.json (aynı `_validate_script` şeması; KESİN uzunluk kontrolü, LLM ~25sn yerine 15-20sn)
     ↓ [analysis/tts.py]          edge-tts (GuyNeural) → voice.mp3 + voice.vtt (kelime-zamanlı)
     ↓ [analysis/stock_media.py]  Pixabay video (tag-relevance gate + dedup) + Wikimedia foto (redirect+thumbnail)
     ↓ [editing/montage.py]       segment render (video cover-crop / foto Ken-Burns) → concat → ASS kinetik altyazı → ses+müzik miks

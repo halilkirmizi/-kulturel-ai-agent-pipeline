@@ -34,8 +34,13 @@ def next_publish_slot(slots=(12, 18)) -> str:
 
 
 def run_news(topic: str, config) -> Path:
-    """Produce (and, when config.upload_enabled, schedule-publish) a news Short."""
-    from analysis.news_script import generate_news_script
+    """Produce (and, when config.upload_enabled, schedule-publish) a news Short.
+
+    Script source: an authored JSON at ``config.news_script_path`` when set
+    (bring-your-own-script — lets the operator condense a source article to an
+    exact length), otherwise an LLM-generated script from ``topic``.
+    """
+    from analysis.news_script import generate_news_script, load_news_script
     from analysis import tts, stock_media
     from editing.montage import build_montage
 
@@ -46,10 +51,13 @@ def run_news(topic: str, config) -> Path:
     out_dir = Path(config.output_dir) / f"news_{ts}"
     media_dir = out_dir / "media"
     out_dir.mkdir(parents=True, exist_ok=True)
-    log.info("=== News mode: %r -> %s ===", topic, out_dir.name)
+    log.info("=== News mode: %r -> %s ===", topic or config.news_script_path, out_dir.name)
 
-    # 1. script + metadata
-    script = generate_news_script(topic, config)
+    # 1. script + metadata (authored file, or LLM from topic)
+    if getattr(config, "news_script_path", ""):
+        script = load_news_script(config.news_script_path)
+    else:
+        script = generate_news_script(topic, config)
     (out_dir / "script.json").write_text(json.dumps(script, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # 2. voiceover + timed subtitles

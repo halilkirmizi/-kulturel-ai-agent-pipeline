@@ -5,6 +5,28 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-11 #3 (trend otomatik tespiti `--news-trend` + assets commit)
+
+**1) `assets/` commit'lendi (`b0997da`):** `--news` montajının kullandığı runtime varlıkları (emoji overlay PNG'leri + 2 telif-güvenli mp3 müzik) git'te değildi → fresh clone montajı kırardı. Commit'lendi+push. NOT: SESSION #2'deki "`--news-script` commit bekliyor" notu bayatmış — özellik zaten `9f8f042`'de commit'liymiş, origin/main ile senkrondu.
+
+**2) YENİ ÖZELLİK: `--news-trend` — trend otomatik tespiti (commit+push `b8ada31`).**
+- **Sorun:** haber konusu manueldi ("bugünün futbol haberi"ni elle yazıyorduk). WebSearch benim (Claude) tool'um, pipeline standalone Python runtime'ında YOK.
+- **Çözüm — `analysis/trend_detector.py`:** 4 telif-siz/key-siz futbol RSS feed'i (BBC Sport / Guardian / ESPN soccer / Sky) → taze pencere filtresi (default **36s**, `TREND_WINDOW_HOURS`, shelf-life kuralına uyar) → cross-source dedup → **Groq LLM en iyi hook'lu taze haberi seçer** ve self-contained factual topic döndürür → `generate_news_script`'i besler. Groq yoksa/başarısızsa **heuristik fallback** (en taze haber). Saf parse/rank fonksiyonları test edilebilir; ağ I/O izole (stock_media stili).
+- **İki guard (canlı testte ortaya çıktı):** LLM önce **25 yaşında oyuncu ölümünü**, sonra **golf rekorunu** seçti. İkisi de hype Short için yanlış → (a) ölüm/suç terimleri `_SKIP_TITLE`'da havuzdan elenir (heuristik yolu da korur), (b) LLM prompt'u **futbol-only + trajedi-yasağı**. Sonuç: tutarlı gerçek futbol haberi (Portugal/Jorge Jesus/Ronaldo canlı seçildi).
+- **Wiring:** CLI `--news-trend` (topic gerekmez) · main.py ~4 satır route (`args.news_trend` ve topic boşsa `detect_trending_topic(config)`) · config değişmedi (detect `config.groq_api_key`/`groq_model` okur).
+- **Canlı doğrulama:** 4 feed → 100 taze haber → LLM uygun futbol haberi seçti (render/upload yapılmadı, sadece detection). **Test: `tests/run_all.py` 17/17 suite, 246/246 check PASS** (yeni `test_trend_detector` 27/27; 219→246).
+
+**Kullanım:**
+```bash
+python main.py --news-trend            # otomatik trend konu → render (önizleme)
+python main.py --news-trend --upload   # otomatik trend → 12/18 programlı public
+TREND_WINDOW_HOURS=24 python main.py --news-trend   # daha dar taze pencere
+```
+
+**Açık / sonraki adımlar:** Cron tam otomatik (günde 1-2 `--news-trend --upload`, peak saate) · b-roll kalitesi (jenerik stok query havuzu) · trend seçimini provenance/öğrenme döngüsüne bağla · birkaç gün sonra `--fetch-analytics` → `xVaQLTb1zAc` gerçek stats.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-11 #2 (bring-your-own-script `--news-script` + Haaland Short yayında)
 
 **Yeni özellik: `--news-script <path>` (commit bekliyor) — hazır metin besleme.**

@@ -1,7 +1,7 @@
 # YouTube Shorts Pipeline — Technical Workflow
 
 > Links: [[kulturel AI agent]] · [[Key Decisions]] · [[SESSION]] · [[CLAUDE]]
-> Güncel: 2026-07-11 (`--news` faceless HABER modu + `--news-script` bring-your-own-script). Önceki: analytics re-auth GERÇEK VERİ + `WHISPER_TASK=translate` (2026-07-10). Modüler yapı Session 11/12.
+> Güncel: 2026-07-11 (`--news-trend` trend otomatik tespiti + `--news`/`--news-script` faceless HABER modu). Önceki: analytics re-auth GERÇEK VERİ + `WHISPER_TASK=translate` (2026-07-10). Modüler yapı Session 11/12.
 
 ## Pipeline Architecture
 
@@ -68,8 +68,10 @@ Klip-çıkarmadan AYRI akış (indirme/whisper/skorlama yok). Kanal, talking-hea
 Short'ları retention'da çöktüğü için (5sn izlenme, %0.1) bu formata döndü.
 
 ```
-python main.py --news "<konu>" [--upload]                    # LLM metin
+python main.py --news "<konu>" [--upload]                    # LLM metin (konu manuel)
 python main.py --news-script news_scripts/<x>.json [--upload]  # elle metin (bring-your-own-script)
+python main.py --news-trend [--upload]                        # konu OTOMATİK (RSS trend)
+    ↓ [analysis/trend_detector.py]  (--news-trend) 4 futbol RSS (BBC/Guardian/ESPN/Sky) → taze pencere (36s, TREND_WINDOW_HOURS, shelf-life) → dedup → Groq LLM en iyi hook'lu haberi seçer → factual topic. Guard: trajedi/ölüm/suç + futbol-dışı spor elenir. Groq yoksa heuristik (en taze). Ağ I/O izole, parse/rank saf/testli.
     ↓ [analysis/news_script.py]  Groq LLM → özgün metin (60-80 kelime, min-retry) + görsel planı + başlık/etiket
     │   VEYA `load_news_script(path)` → elle yazılmış script.json (aynı `_validate_script` şeması; KESİN uzunluk kontrolü, LLM ~25sn yerine 15-20sn)
     ↓ [analysis/tts.py]          edge-tts (GuyNeural) → voice.mp3 + voice.vtt (kelime-zamanlı)

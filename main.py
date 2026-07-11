@@ -143,6 +143,14 @@ def main(argv=None) -> None:
         karaoke=args.karaoke,
         trim_silence=args.trim_silence,
     )
+
+    # News mode — separate flow (topic → script → voice → stock media → montage → upload).
+    # Does not touch the clip-extraction pipeline (no download/whisper/scoring).
+    if args.news:
+        from core.news_mode import run_news
+        run_news(args.news, config)
+        return
+
     AOR.register_read("format_config", f"formats/{args.format}.json", __name__)
 
     # Load persisted AOR state

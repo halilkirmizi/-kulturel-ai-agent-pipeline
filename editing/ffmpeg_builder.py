@@ -45,9 +45,14 @@ def ffprobe_path() -> str:
     return "ffprobe"
 
 
-def _run_ffmpeg_capture(cmd: List[str], timeout: Optional[float] = None) -> "subprocess.CompletedProcess[str]":
-    """Run ffmpeg and capture output. Single internal subprocess.run call site."""
-    return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+def _run_ffmpeg_capture(cmd: List[str], timeout: Optional[float] = None,
+                        cwd: Optional[str] = None) -> "subprocess.CompletedProcess[str]":
+    """Run ffmpeg and capture output. Single internal subprocess.run call site.
+
+    ``cwd`` lets callers run relative to an output dir so filter paths
+    (subtitles/fontfile) avoid Windows drive-letter colon escaping.
+    """
+    return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=cwd)
 
 
 def probe_duration(path: Path) -> float:
@@ -121,11 +126,12 @@ def gpu_encode_args(config: PipelineConfig) -> list:
     ]
 
 
-def execute(cmd: List[str]) -> int:
+def execute(cmd: List[str], cwd: Optional[str] = None) -> int:
     """Execute an FFmpeg command. Returns exit code. This is the ONLY execution function.
 
     Args:
         cmd: Complete FFmpeg command as list of strings.
+        cwd: Optional working directory (lets filter paths stay relative).
 
     Returns:
         Exit code (0 = success).
@@ -134,7 +140,7 @@ def execute(cmd: List[str]) -> int:
         FileNotFoundError: if ffmpeg binary not found.
     """
     log.debug("ffmpeg execute: %s", " ".join(str(c) for c in cmd[:12]) + ("..." if len(cmd) > 12 else ""))
-    result = _run_ffmpeg_capture(cmd)
+    result = _run_ffmpeg_capture(cmd, cwd=cwd)
     if result.returncode != 0:
         log.error("ffmpeg failed (rc=%d): %s", result.returncode, result.stderr[-500:])
     return result.returncode

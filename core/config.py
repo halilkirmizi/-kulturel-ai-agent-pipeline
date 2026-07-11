@@ -110,6 +110,9 @@ class PipelineConfig:
     llm_temperature: float = 0.3
     llm_max_chars: int = 30000
 
+    # Stock media (news mode) — license-safe b-roll/photos
+    pixabay_api_key: str = ""
+
     # Clip-selection provider: "groq" (default) or "claude" (Anthropic — stronger
     # editorial judgment). Claude path reads ANTHROPIC_API_KEY from env.
     select_provider: str = "groq"
@@ -226,6 +229,7 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         # LLM
         groq_api_key=overrides.get("groq_api_key") or os.getenv("GROQ_API_KEY", ""),
         groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        pixabay_api_key=os.getenv("PIXABAY_API_KEY", ""),
         llm_temperature=float(os.getenv("LLM_TEMPERATURE", "0.3")),
         llm_max_chars=int(os.getenv("LLM_MAX_CHARS", "30000")),
         select_provider=overrides.get("select_provider", os.getenv("SELECT_PROVIDER", "groq")),

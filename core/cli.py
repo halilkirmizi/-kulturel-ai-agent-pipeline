@@ -27,6 +27,10 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
                         help="News mode with a hand-written script JSON instead of the LLM "
                              "(bring-your-own-script — condense a source article to an exact "
                              "length). Implies news mode; --news topic optional.")
+    parser.add_argument("--news-trend", action="store_true",
+                        help="News mode with an AUTO-DETECTED trending football topic "
+                             "(free RSS headlines -> LLM picks the best fresh story). "
+                             "No manual topic needed. Add --upload to schedule-publish.")
     parser.add_argument("--resume", help="Resume Phase 2 from clip path (e.g. short_XXX/clip_1)")
     parser.add_argument("--format", default="format1", help="Format config name (default: format1)")
     parser.add_argument("--content-type", default="general", choices=["general", "football"],

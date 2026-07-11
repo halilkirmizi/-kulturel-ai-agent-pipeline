@@ -147,10 +147,14 @@ def main(argv=None) -> None:
 
     # News mode — separate flow (topic → script → voice → stock media → montage → upload).
     # Does not touch the clip-extraction pipeline (no download/whisper/scoring).
-    # Triggered by --news (topic) or --news-script (authored script file).
-    if args.news_script or args.news is not None:
+    # Triggered by --news (topic), --news-script (authored file), or --news-trend (auto-topic).
+    if args.news_script or args.news is not None or args.news_trend:
         from core.news_mode import run_news
-        run_news(args.news or "", config)
+        topic = args.news or ""
+        if args.news_trend and not topic and not args.news_script:
+            from analysis.trend_detector import detect_trending_topic
+            topic = detect_trending_topic(config)
+        run_news(topic, config)
         return
 
     AOR.register_read("format_config", f"formats/{args.format}.json", __name__)

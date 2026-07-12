@@ -1,7 +1,7 @@
 # YouTube Shorts Pipeline — Technical Workflow
 
 > Links: [[kulturel AI agent]] · [[Key Decisions]] · [[SESSION]] · [[CLAUDE]]
-> Güncel: 2026-07-11 (`--news-trend` trend otomatik tespiti + `--news`/`--news-script` faceless HABER modu). Önceki: analytics re-auth GERÇEK VERİ + `WHISPER_TASK=translate` (2026-07-10). Modüler yapı Session 11/12.
+> Güncel: 2026-07-12 (`--voice-file` kendi-ses + beat-timed elle montaj + telif-güvenli görsel kaynak). Önceki: `--news-trend` trend otomatik tespiti + faceless HABER modu (2026-07-11). Modüler yapı Session 11/12.
 
 ## Pipeline Architecture
 
@@ -84,6 +84,18 @@ python main.py --news-trend [--upload]                        # konu OTOMATİK (
 - **Gerekli:** `.env` → `PIXABAY_API_KEY`. Music: `assets/music/`.
 - **Relevance filtresi:** tag'de "soccer"/"football" şart + reject listesi (konser/okyanus/tenis/CGI/american football eler) + görülmüş-ID dedup.
 - **main.py:** ~8 satır route; mantık ayrı modüllerde; altyapı (config/logger/demonetization/upload/ffmpeg_builder) ortak.
+
+#### `--voice-file` — kendi sesin (bring-your-own-voice, 2026-07-12)
+- `--voice-file <path>` verilince edge-tts ATLANIR: kayıt (`mp3/m4a/wav`) `voice.mp3`'e kopyalanır, **faster-whisper ile transkribe** edilip `tts.vtt_from_segments()` montaj-uyumlu WEBVTT (`voice.vtt`) yazar → altyazı senkron + görsel kesim temposu korunur.
+- `--news-script` ile eşleştir (aynı yazılı metin). `WHISPER_MODEL=small` isim doğruluğu için.
+- **GOTCHA:** aksanlı İngilizce'de whisper otomatik dili yanlış algılayabilir (ör. `tr`) → altyazı bozulur. Fix: transkripsiyonu `WhisperModel.transcribe(language='en')` ile yeniden çalıştırıp `voice.vtt`'yi yenile.
+
+#### Beat-timed elle montaj + telif-güvenli görsel (kaliteli video, 2026-07-12)
+- `montage.build_montage` görselleri **eşit** böler (`total/n`) → uzun cümlelerde isim/anlar ~1 beat kayar. En iyi videolar için VTT cue zamanına göre **değişken-süreli** segmentli elle build script (scratchpad) kullanıldı: her görsel kendi `(start,end)`'inde render → concat → captions.ass burn → ses+müzik.
+- Ses **1.10x**: `atempo=1.10` (perde korunur) → `voice_110.mp3`; VTT zamanları `/1.10` ölçeklenir → `voice_110.vtt` (senkron korunur).
+- **Görsel kaynak (hepsi telif-güvenli):** gerçek CC maç fotosu (Wikimedia Commons, ör. "Erling Haaland Morocco v Norway 2026" CC BY-SA 4.0) · PD arşiv (1966 finali) · PD bayraklar (basitler ffmpeg ile üretilir) · CC kupa (FIFA World Cup Trophy foto) · **kendi ffmpeg grafik kartların** (GOAL skor kartı, THE FINAL FOUR 2x2 yüz gridi, WHO WINS). **Broadcast maç KLİBİ ASLA** (Content ID = kesin claim, süre fark etmez); still CC/PD foto Content ID tetiklemez.
+- **Bayrak/altyazı gotcha:** yanan altyazı (libass + Impact fontu) renkli bayrak emojisi basmaz → bayrak yazının içine gömülemez; ekrana **rozet** (overlay) olarak bindirilir.
+- İleride: pipeline'a beat-timing + görsel-provenance opsiyonu (şu an elle).
 
 ### Orchestration & control katmanı (`core/`)
 

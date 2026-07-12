@@ -5,6 +5,31 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-12 (`--voice-file` kendi-ses özelliği + beat-timed elle montaj + 2 public video)
+
+**1) YENİ ÖZELLİK: `--voice-file` — bring-your-own-voice (commit+push `f62379f`).**
+- Kullanıcı haber metnini **kendi sesiyle** okumak istedi (AI TTS yerine). Sorun: kayıtta edge-tts'in yazdığı `voice.vtt` yok → montaj altyazı zamanlaması + görsel kesim temposunu kaybeder.
+- Çözüm: `--voice-file <path>` → kayıt `voice.mp3`'e kopyalanır, **faster-whisper ile transkribe edilip** `tts.vtt_from_segments()` montaj-uyumlu WEBVTT üretir. TTS atlanır.
+- **Mimari:** `core/config.py` `voice_file_path` alanı + build_config · `core/cli.py` `--voice-file` · `core/news_mode.py` voice-file branch (kopya+whisper) vs TTS · `analysis/tts.py` `vtt_from_segments`+`_fmt_ts` · `main.py` route. `--news-script` ile eşleştir (aynı metin).
+- **Test:** yeni `tests/test_voice_file.py` (VTT round-trip, 12 check) → **`tests/run_all.py` 18/18 suite, 258/258 PASS**.
+
+**2) GOTCHA — aksanlı İngilizce'de whisper dili yanlış (Karar 32).** Türk aksanlı İngilizce kayıtta whisper otomatik dili **Türkçe** algıladı → altyazı tamamen bozuk. Fix: `WhisperModel.transcribe(language='en')` ile yeniden çalıştır → doğru metin. İleride voice-file yoluna EN varsayılanı/dil-env eklenebilir.
+
+**3) BEAT-TIMED ELLE MONTAJ + telif-güvenli görsel kaynak (Karar 33).** `montage.build_montage` görselleri EŞİT böler → isimler/anlar ~1 beat kayar. Kaliteli videolar için VTT cue zamanına göre **değişken-süreli** segmentli elle build script (scratchpad). Görseller: gerçek CC maç fotoları (Commons — Haaland Morocco v Norway 2026 CC BY-SA, Mbappé/Yamal/Messi/Álvarez portreleri), PD arşiv (1966 finali, Hurst), PD bayraklar (ffmpeg üretimi FR/ENG), kendi ffmpeg grafik kartlarım (GOAL skor kartı, THE FINAL FOUR 2x2 yüz gridi, WHO WINS, kupa). Ses **1.10x** `atempo` (perde korunur) + VTT `/1.10` ölçekle. **Broadcast maç klibi = Content ID → asla; still CC/PD foto = güvenli.**
+
+**4) İKİ PUBLIC VİDEO yayınlandı (kullanıcı sesiyle):**
+- **`xii8AxO7fXw`** — "Bellingham BREAKS Norwegian Hearts" (England 2-1 Norway, çeyrek final). Gerçek maç fotoları + 1966 finali PD foto + GOAL 2-1 kartı. Kullanıcı hemen public istedi (peak-slot bilerek çiğnendi).
+- **`Q8gcnH8yt0M`** — "The Final Four Are SET" (yarı final önizleme, EVERGREEN). 2x2 yıldız gridi + ülke bayrakları (kart + oyuncu-beat rozeti) + kupayla ("cup" derken FIFA kupası CC BY-SA) kapanış. Yorum/analiz formatı — tek maça bağlı değil, SF'ye (14-15 Tem) kadar taze.
+- İkisi de performance store'a kayıtlı (pending) → birkaç gün sonra `--fetch-analytics`.
+
+**Gözlem — bayrak altyazıda:** Yanan altyazı (libass + Impact) renkli bayrak emojisi basmıyor → bayrak yazının içine gömülemez. Çözüm: bayrağı ekrana **rozet** olarak bindirdim (oyuncu beat'inde sol üst) + kartlarda bayrak görseli.
+
+**İptal:** Argentina 3-1 Switzerland videosu (dünkü tek maç) yapılmadı — kullanıcı daha genel/evergreen "Final Four" yorumunu tercih etti.
+
+**Açık / sonraki adımlar:** pipeline'a beat-timing + görsel-provenance opsiyonu (şu an elle script) · voice-file yolunda whisper dil-zorlama · news moduna `--public`/`--publish-now` (hâlâ eksik — direkt upload'la aşıldı) · birkaç gün sonra `--fetch-analytics` (xii8AxO7fXw, Q8gcnH8yt0M, xVaQLTb1zAc).
+
+---
+
 ## GÜNCEL DURUM — 2026-07-11 #3 (trend otomatik tespiti `--news-trend` + assets commit)
 
 **1) `assets/` commit'lendi (`b0997da`):** `--news` montajının kullandığı runtime varlıkları (emoji overlay PNG'leri + 2 telif-güvenli mp3 müzik) git'te değildi → fresh clone montajı kırardı. Commit'lendi+push. NOT: SESSION #2'deki "`--news-script` commit bekliyor" notu bayatmış — özellik zaten `9f8f042`'de commit'liymiş, origin/main ile senkrondu.

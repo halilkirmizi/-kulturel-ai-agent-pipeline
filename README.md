@@ -11,10 +11,21 @@ algorithm tests each Short on a small audience and only expands it if the first
 **Original news script → AI (or self) voiceover → fast-cut license-safe motion
 b-roll + real player photos → kinetic captions → music.**
 
+Two content angles now run in parallel:
+- **Match result** ("England 2-1 Norway") — highest freshness; render+publish same day.
+- **Commentary / preview** ("The Final Four — who wins it all?") — **evergreen**,
+  stays relevant across the round; not tied to a single result.
+
+Voice can be AI (edge-tts) or **your own** (`--voice-file`; whisper recovers the
+caption timing). For the highest-quality videos, visuals are hand-timed to the
+narration beat and sourced from **real CC/PD photos** (Wikimedia match photos,
+archival shots, flags) plus **self-made graphic cards** (GOAL / scoreline /
+matchup grids / trophy). See WORKFLOW.md.
+
 ## Hard rules
-- **Demonetization-safe:** no broadcast match footage (Content ID). Only
-  license-safe Pixabay stock + CC Wikimedia player photos + **original**
-  commentary (not reused). AI voice alone does not flag a channel.
+- **Demonetization-safe:** no broadcast match footage (Content ID — a single
+  second is claimed). Only license-safe stock + CC/PD photos + self-made cards +
+  **original** commentary (not reused). AI voice alone does not flag a channel.
 - **Publish only at peak slots — 12:00 / 18:00 (local). Never dead hours.**
   Always schedule via `--publish-at` / `next_publish_slot()`.
 - Hook in the first second; the title must not promise visuals the video can't

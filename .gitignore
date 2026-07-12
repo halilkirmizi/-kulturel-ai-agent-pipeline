@@ -18,6 +18,11 @@ weights/
 upload/.upload_quota.json
 upload/.upload_log.json
 
+# Voice recordings (personal audio for --voice-file; regeneratable content)
+news_scripts/*.m4a
+news_scripts/*.mp3
+news_scripts/*.wav
+
 # Sensitive credentials
 .env
 upload/client_secret.json

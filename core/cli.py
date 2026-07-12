@@ -31,6 +31,10 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
                         help="News mode with an AUTO-DETECTED trending football topic "
                              "(free RSS headlines -> LLM picks the best fresh story). "
                              "No manual topic needed. Add --upload to schedule-publish.")
+    parser.add_argument("--voice-file", metavar="PATH", default="",
+                        help="News mode: use a PRE-RECORDED voiceover (your own voice) "
+                             "instead of AI TTS. Caption timings are recovered by "
+                             "transcribing the audio. Pair with --news-script (same text).")
     parser.add_argument("--resume", help="Resume Phase 2 from clip path (e.g. short_XXX/clip_1)")
     parser.add_argument("--format", default="format1", help="Format config name (default: format1)")
     parser.add_argument("--content-type", default="general", choices=["general", "football"],

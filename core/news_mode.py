@@ -61,8 +61,23 @@ def run_news(topic: str, config) -> Path:
     (out_dir / "script.json").write_text(json.dumps(script, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # 2. voiceover + timed subtitles
-    tts.synthesize(script["narration"], out_dir / "voice.mp3", out_dir / "voice.vtt",
-                   voice=_VOICE, rate=_RATE)
+    voice_mp3 = out_dir / "voice.mp3"
+    voice_vtt = out_dir / "voice.vtt"
+    if getattr(config, "voice_file_path", ""):
+        # Bring-your-own-voice: use the operator's recording instead of AI TTS.
+        # A recording has no TTS-written VTT, so transcribe it to recover the
+        # caption timings the montage needs (subtitle burn + visual cut pacing).
+        import shutil
+        from analysis.transcription import transcribe
+        src = Path(config.voice_file_path)
+        if not src.exists():
+            raise RuntimeError(f"--voice-file not found: {src}")
+        shutil.copyfile(src, voice_mp3)
+        log.info("[news] using recorded voiceover %s (%d KB)", src.name, src.stat().st_size // 1024)
+        segments, _ = transcribe(voice_mp3, config)
+        tts.vtt_from_segments(segments, voice_vtt)
+    else:
+        tts.synthesize(script["narration"], voice_mp3, voice_vtt, voice=_VOICE, rate=_RATE)
 
     # 3. stock media, in visual order (photos = Wikimedia players, videos = Pixabay b-roll)
     visuals = script["visuals"]

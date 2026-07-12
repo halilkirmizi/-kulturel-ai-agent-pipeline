@@ -143,6 +143,7 @@ def main(argv=None) -> None:
         karaoke=args.karaoke,
         trim_silence=args.trim_silence,
         news_script_path=args.news_script,
+        voice_file_path=args.voice_file,
     )
 
     # News mode — separate flow (topic → script → voice → stock media → montage → upload).

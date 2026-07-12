@@ -117,6 +117,11 @@ class PipelineConfig:
     # Empty = generate the script from the topic via LLM.
     news_script_path: str = ""
 
+    # News mode: path to a pre-recorded voiceover (bring-your-own-voice). When
+    # set, skip AI TTS, use this audio, and recover caption timings by
+    # transcribing it. Pair with news_script_path (same spoken text).
+    voice_file_path: str = ""
+
     # Clip-selection provider: "groq" (default) or "claude" (Anthropic — stronger
     # editorial judgment). Claude path reads ANTHROPIC_API_KEY from env.
     select_provider: str = "groq"
@@ -235,6 +240,7 @@ def build_config(format_name: str = "format1", **overrides: Any) -> PipelineConf
         groq_model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
         pixabay_api_key=os.getenv("PIXABAY_API_KEY", ""),
         news_script_path=overrides.get("news_script_path", ""),
+        voice_file_path=overrides.get("voice_file_path", ""),
         llm_temperature=float(os.getenv("LLM_TEMPERATURE", "0.3")),
         llm_max_chars=int(os.getenv("LLM_MAX_CHARS", "30000")),
         select_provider=overrides.get("select_provider", os.getenv("SELECT_PROVIDER", "groq")),

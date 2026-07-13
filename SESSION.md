@@ -5,6 +5,38 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-14 (Analytics API teşhis katmanı + İngiltere-Arjantin teaser + çapraz-paylaşım telif dersleri)
+
+**1) YENİ ÖZELLİK: Analytics API teşhis katmanı (commit `a4dbd8b`, push bekliyor).**
+- `--fetch-analytics` artık Data API stats'ın üstüne **retention + trafik-kaynağı** çekiyor (youtubeAnalytics v2 `reports.query`) ve video-başı deterministik teşhis basıyor: `retention_problem` / `good_retention_low_reach` / `healthy_feed_distribution` / `distributed_no_feed` / `low_reach` / `no_data`.
+- Mimari: `upload/youtube.py` → `yt-analytics.readonly` scope + `_get_credentials()`/`get_analytics_service()` (v2). `analysis/youtube_analytics.py` (yeni, saf+mock-test). `core/performance.py` → `attach_analytics`/`analytics_pending_ids`/`summary.analyzed`. `main.py` → teşhis tablosu. Test: yeni `test_youtube_analytics.py` 25 check → **19/19 suite, 283/283 PASS**.
+- **DÜRÜST KISIT:** thumbnail impressions + CTR public Analytics API'de YOK (Studio-only). Onun yerine `averageViewPercentage` (retention) + `insightTrafficSourceType` (SHORTS feed) — flag sorusu için zaten daha kesin.
+
+**2) KANAL TEŞHİSİ (Studio + analytics): kanal FLAGLI DEĞİL, futbol yanlış kitle.**
+- Kanıt: eski Messi Short **1.291 izlenme / 48 gösterim** (feed'den geldi) → shadowban olsa imkansız. Toplam 1.212 gösterim/28g → dağıtım aktif.
+- Futbol HABER Short'ları kanalın **EN KÖTÜ** içeriği (Spain/France ~5 view, %0 CTR). Kanal `truth`/CIA izleyicisiyle etiketli → futbol yanlış kitleye düşüyor.
+- **Kanalın kazanan damarı: CIA/whistleblower/truth** (CTR %3.9-5.3, futbolun 2-3 katı). Gelecek yön oraya.
+
+**3) İngiltere-Arjantin "...YOU." teaser (elle build, scratchpad — pipeline'a girmedi).**
+- Konsept: İngiltere kutlama → gerilim/kararma "YOUR NEXT OPPONENT IS..." → HARD CUT + drop → Messi "...YOU." → Arjantin tehdidi (aura + WORLD CHAMPIONS kartı) → end card. 22sn.
+- **Telif-güvenli görsel:** yeni Commons CC fetcher (lisans-filtreli, soyadı-zorunlu, top-bias crop) → Bellingham kırmızı #10, Messi Arjantin dik-bakış + kollar-havada aura, Declan Rice aksiyon (hepsi CC BY / CC BY-SA 2026 maçları). **Broadcast klip ASLA.**
+- **Kartlar:** PIL ile premium (gradient, takım renkleri, gold VS, çizili yıldızlar). NOT: **CC "Messi kupa kaldırma" fotosu YOK** (hepsi Getty) → yerine "WORLD CHAMPIONS · ARGENTINA 2022" kartı + Messi formasındaki 2022 arması.
+- **Ses:** ffmpeg ile sıfırdan trailer ses-tasarımı (riser + BRAAAM impact + drone + pulse), drop'a senkron, %100 telifsiz. + sessiz sürüm.
+- Dosyalar: `temp/teaser_v6_FINAL.mp4` (sesli/YouTube) + `temp/teaser_v6_SILENT_tiktok.mp4`.
+
+**4) ÇAPRAZ-PAYLAŞIM TELİF DERSLERİ (önemli):**
+- "Your Next Opponent Is You" = Xundr'ın Spotify parçası = **telifli.** TikTok/IG'de uygulama-içi ses lisanslı; YouTube'da Content ID claim = demonetize.
+- **Her platforma temiz kaynaktan AYRI yükle + sesi o platformun uygulamasından ekle.** TikTok'tan indirip IG'ye atma → watermark + telif → IG reel'i gizler ("content may be hidden", sadece sahibi görür).
+- IG **İşletme hesabı** müzik kütüphanesini kısıtlar → Kişisel hesap gerekir. YouTube'da sonradan trend-ses eklenmez (sessiz yüklersen sessiz kalır).
+- Uzun açıklama viral kaldıracı DEĞİL (retention öyle); tek meşru faydası SEO/arama + CC atıf zorunluluğu.
+
+**Açık / sonraki adımlar:**
+1. **Kanal yönü: CIA/truth/mystery'e dön** (analytics-destekli). Piller: declassified sırlar, çözülmemiş gizemler/kayıplar, UFO/UAP (kanal adı `The Truth Is Out There`), devlet örtbasları. Somut ilk video seçilecek.
+2. Teaser YouTube sürümü: trailer ses-tasarımıyla mı yoksa Pixabay/Ses-kitaplığı track mi — kullanıcı seçecek.
+3. `a4dbd8b` push bekliyor.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-12 (`--voice-file` kendi-ses özelliği + beat-timed elle montaj + 2 public video)
 
 **1) YENİ ÖZELLİK: `--voice-file` — bring-your-own-voice (commit+push `f62379f`).**

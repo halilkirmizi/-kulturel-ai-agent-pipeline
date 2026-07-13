@@ -18,12 +18,16 @@ from core.logger import get_logger
 
 log = get_logger(__name__)
 
-# OAuth 2.0 scopes for YouTube Data API v3
-# - youtube.upload: publish videos
+# OAuth 2.0 scopes.
+# - youtube.upload: publish videos (Data API v3)
 # - youtube.readonly: read statistics (videos.list part=statistics) for --fetch-analytics
+# - yt-analytics.readonly: retention + traffic-source reports (Analytics API v2)
+#   Adding this scope invalidates any older token via the scope-subset check
+#   below, forcing one fresh browser consent so analytics reports work.
 _SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.readonly",
+    "https://www.googleapis.com/auth/yt-analytics.readonly",
 ]
 _TOKEN_FILE = Path.home() / ".youtube_upload_token.pickle"
 _CLIENT_SECRETS = Path(__file__).resolve().parent / "client_secret.json"
@@ -34,17 +38,19 @@ _UPLOAD_LOG = Path(__file__).resolve().parent / ".upload_log.json"
 _DAILY_UPLOAD_LIMIT = int(os.getenv("YOUTUBE_DAILY_UPLOAD_LIMIT", "6"))
 
 
-def _get_authenticated_service():
-    """Authenticate and return a YouTube API service instance.
+def _get_credentials():
+    """Authenticate via OAuth 2.0 and return valid credentials.
 
-    Uses OAuth 2.0 with local token caching. First run opens browser for auth.
+    Uses local token caching. First run (or a token missing a required scope)
+    opens the browser for consent. Shared by every Google API client we build
+    (Data API v3 for upload/stats, Analytics API v2 for reports) so token
+    refresh, the scope-subset check, and re-consent live in one place.
     """
     AOR.register_read("client_secret", _CLIENT_SECRETS, __name__)
     try:
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
         from google_auth_oauthlib.flow import InstalledAppFlow
-        from googleapiclient.discovery import build
     except ImportError:
         log.error(
             "Missing Google API dependencies. Install:\n"
@@ -98,7 +104,29 @@ def _get_authenticated_service():
         AOR.register_write("oauth_token", _TOKEN_FILE, __name__)
         log.info("OAuth token saved to %s", _TOKEN_FILE)
 
-    return build("youtube", "v3", credentials=creds)
+    return creds
+
+
+def _get_authenticated_service():
+    """YouTube Data API v3 client (upload + statistics)."""
+    from googleapiclient.discovery import build
+
+    return build("youtube", "v3", credentials=_get_credentials())
+
+
+def get_analytics_service():
+    """YouTube Analytics API v2 client (reports.query — retention + traffic).
+
+    Returns None on any failure so --fetch-analytics degrades gracefully
+    instead of crashing when credentials/deps are unavailable.
+    """
+    try:
+        from googleapiclient.discovery import build
+
+        return build("youtubeAnalytics", "v2", credentials=_get_credentials())
+    except Exception as exc:
+        log.warning("[analytics] could not build Analytics client: %s", exc)
+        return None
 
 
 def _get_video_signature(video_path: Path) -> str:

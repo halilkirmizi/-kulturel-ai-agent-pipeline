@@ -110,6 +110,22 @@ class PerformanceStore:
         r["stats"] = stats
         r["performance_score"] = compute_performance_score(stats)
 
+    def attach_analytics(self, video_id: str, data: Dict[str, Any]) -> None:
+        """Attach rich Analytics-API data (metrics + traffic + diagnosis).
+
+        Separate from ``attach_stats`` so the existing Data-API-based
+        performance_score/learning loop is untouched; this only enriches the
+        record with retention + traffic-source diagnosis.
+        """
+        r = self.records.get(video_id)
+        if r is None:
+            return
+        r["analytics"] = data
+
+    def analytics_pending_ids(self) -> List[str]:
+        """video_ids that have no rich analytics attached yet."""
+        return [vid for vid, r in self.records.items() if not r.get("analytics")]
+
     def summary(self) -> Dict[str, Any]:
         scored = [r for r in self.records.values() if r.get("performance_score") is not None]
         avg = round(sum(r["performance_score"] for r in scored) / len(scored), 4) if scored else None
@@ -117,5 +133,6 @@ class PerformanceStore:
             "total": len(self.records),
             "pending": len(self.pending_ids()),
             "scored": len(scored),
+            "analyzed": sum(1 for r in self.records.values() if r.get("analytics")),
             "avg_performance": avg,
         }

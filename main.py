@@ -114,6 +114,30 @@ def _run_demonetization_check(clip_dirs, config) -> None:
     registry.use("demonetization_check")
 
 
+def _print_analytics_diagnosis(store) -> None:
+    """Print a compact per-video retention + Shorts-feed diagnosis table."""
+    rows = []
+    for vid, r in store.records.items():
+        d = (r.get("analytics") or {}).get("diagnosis")
+        if d:
+            rows.append((vid, r, d))
+    if not rows:
+        return
+    # Worst verdicts first so problems surface at the top.
+    order = {"retention_problem": 0, "low_reach": 1, "distributed_no_feed": 2,
+             "good_retention_low_reach": 3, "healthy_feed_distribution": 4, "no_data": 5}
+    rows.sort(key=lambda t: order.get(t[2]["verdict"], 9))
+
+    print("\nPer-video diagnosis (Analytics API — retention + Shorts feed):")
+    for vid, r, d in rows:
+        title = ((r.get("hook_text") or "") or vid)[:32]
+        print(f"  [{d['verdict']:<24}] {vid}  "
+              f"views={d['views']:>5}  retention={d['retention_pct']:.0f}%  "
+              f"feed={d['shorts_feed_share']:.0%}  \"{title}\"")
+        for f in d.get("flags", []):
+            print(f"       - {f}")
+
+
 def main(argv=None) -> None:
     if argv is None:
         argv = sys.argv[1:]
@@ -181,21 +205,43 @@ def main(argv=None) -> None:
         from core.performance import PerformanceStore
         from core.upload import PERF_STORE
         from analysis.youtube_stats import fetch_stats
+        from analysis.youtube_analytics import fetch_analytics
         store = PerformanceStore(PERF_STORE)
-        pending = store.pending_ids()
         print(f"Performance store: {store.summary()}")
-        if not pending:
-            print("No pending videos to fetch.")
+        if not store.records:
+            print("No uploaded videos on record yet.")
             return
-        print(f"Fetching YouTube stats for {len(pending)} video(s)...")
-        stats = fetch_stats(pending)
-        if not stats:
-            print("No stats returned (missing credentials or API error).")
-            return
-        for vid, s in stats.items():
-            store.attach_stats(vid, s)
+
+        # 1) Basic Data-API stats (views/likes/comments -> performance_score).
+        pending = store.pending_ids()
+        if pending:
+            print(f"Fetching basic stats for {len(pending)} video(s)...")
+            stats = fetch_stats(pending)
+            for vid, s in (stats or {}).items():
+                store.attach_stats(vid, s)
+            if not stats:
+                print("  No basic stats returned (missing credentials or API error).")
+        else:
+            print("Basic stats: nothing pending.")
+
+        # 2) Rich Analytics-API diagnosis (retention + Shorts-feed traffic) for
+        #    any record still lacking it — backfills old records once, and
+        #    covers every new upload automatically.
+        analytics_targets = store.analytics_pending_ids()
+        if analytics_targets:
+            print(f"Fetching retention + traffic analytics for {len(analytics_targets)} video(s)...")
+            analytics = fetch_analytics(analytics_targets)
+            for vid, a in (analytics or {}).items():
+                store.attach_analytics(vid, a)
+            if not analytics:
+                print("  No analytics returned — re-auth in the browser (new yt-analytics "
+                      "scope) or check API access.")
+        else:
+            print("Analytics: nothing pending.")
+
         store.save()
         print(f"Updated. {store.summary()}")
+        _print_analytics_diagnosis(store)
         return
     if args.propose_weights:
         from core.performance import PerformanceStore

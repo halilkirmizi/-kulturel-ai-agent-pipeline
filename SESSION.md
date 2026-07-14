@@ -37,6 +37,15 @@
 - **CC foto sınırı doğrulandı:** Openverse (Flickr+tüm CC) = tüm serbest internette ~2-3 Yamal fotosu, hepsi Wikimedia. İkonik anlar (Messi kupa) hep Getty → CC yok. Foto Content-ID taranmaz (still), riski müzik/videodan düşük → kullanıcı isterse press foto SAĞLAR (ben Getty indirmem).
 - Ayrıca ESP-FRA teaser (`temp/teaser_ESP_FRA_*`): Yamal+Pedri+Rodri / Mbappé reveal / bayraklı end card, ara kart yok.
 
+**6) TEASER TERCİHLERİ (kullanıcı onayı — bir sonraki sefer uygula):**
+- **Reveal stili:** Mbappé "**villain / kırmızı-lazer göz**" klibi (Magic Hour image-to-video, `output.mp4`) → kullanıcı BEĞENDİ. Reveal dramatik/meme olsun.
+- **Kesme:** kırmızı flash İSTEMİYOR ("alakasız"). Temiz hard cut.
+- **Reveal segmenti GİDEREK KARARSIN** (bright→dark, `eq=brightness='-0.6*min(1,t/DUR)'`) → lazer gözler öne çıksın. Kararma reveal İÇİNDE, ayrı siyah-filtre değil.
+- **Tek yazı = "...YOU."** (SPAIN ARE THROUGH / INTO THE SEMIS vb. yazıları İSTEMİYOR).
+- **Yapı:** ~9sn kutlama sahneleri → Mbappé'den ÖNCE Yamal anı → drop → Mbappé "...YOU." → bayrak kartı.
+- **Watermark:** Kling/Hailuo/Magic Hour → zoom-crop ile kes (kare 640 için scale 2200 → crop top-biased y=30).
+- **⚠️ Broadcast TEST:** kullanıcı Spain-Belgium highlights'tan test kesti (`temp/TEST_DONOTPUBLISH_*`, Yamal şut 1:16-1:19 + kutlamalar 0:32/1:40). Sadece "nasıl durur" testi — YAYINLANMAZ (Content ID). Yayın için broadcast→CC foto + AI klip.
+
 **Açık / sonraki adımlar:**
 1. **Kanal yönü: CIA/truth/mystery'e dön** (analytics-destekli). Piller: declassified sırlar, çözülmemiş gizemler/kayıplar, UFO/UAP (kanal adı `The Truth Is Out There`), devlet örtbasları. Somut ilk video seçilecek.
 2. Teaser'lar TikTok/IG (silent + in-app ses) + YouTube (trailer sesli) yayınlanacak — maç 15 Tem, aynı gün çıkmalı.

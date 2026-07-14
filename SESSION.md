@@ -30,10 +30,17 @@
 - IG **İşletme hesabı** müzik kütüphanesini kısıtlar → Kişisel hesap gerekir. YouTube'da sonradan trend-ses eklenmez (sessiz yüklersen sessiz kalır).
 - Uzun açıklama viral kaldıracı DEĞİL (retention öyle); tek meşru faydası SEO/arama + CC atıf zorunluluğu.
 
+**5) AI-VIDEO HYBRID TEASER workflow (yeni, güçlü — elle build, scratchpad).**
+- Kullanıcı gerçek Bellingham/Messi YÜZÜ istedi. Çözüm zinciri: **text-to-video benzemez + ünlü filtresi** → **image-to-video** (gerçek fotoğrafı başlangıç karesi yap, AI hareketlendirir, yüz gerçek kalır). **GPT Image / Firefly gerçek ünlü üretmez** (Firefly kurumsal öğrenci hesabında admin kapatmış → "accès" hatası).
+- **Ücretsiz araç taktiği:** günlük-kredi yenilenenleri dağıt (Kling / Hailuo / Pixverse / Vidu). Kling kredisi bitince Hailuo'ya geçildi. Kling free = 720p + watermark; Hailuo benzer. **Watermark'ı hafif zoom-crop ile kırp** (scale 1210:2150 → crop 1080:1920) + 1080p'ye upscale.
+- **Sonuç:** Bellingham 2× klip (Kling, kutlama) + Messi smirk klibi (Hailuo, image-to-video ← `temp/messi_portrait.jpg`) → pipeline'da birleştirildi: darken/flash geçiş + trailer sesi (drop 8.4s) + **PIL bayrak end card** (İngiltere St George + Arjantin güneşli, çizildi = telifsiz). Dosya: `temp/teaser_AIVIDEO_ENG_ARG.mp4` (+SILENT).
+- **CC foto sınırı doğrulandı:** Openverse (Flickr+tüm CC) = tüm serbest internette ~2-3 Yamal fotosu, hepsi Wikimedia. İkonik anlar (Messi kupa) hep Getty → CC yok. Foto Content-ID taranmaz (still), riski müzik/videodan düşük → kullanıcı isterse press foto SAĞLAR (ben Getty indirmem).
+- Ayrıca ESP-FRA teaser (`temp/teaser_ESP_FRA_*`): Yamal+Pedri+Rodri / Mbappé reveal / bayraklı end card, ara kart yok.
+
 **Açık / sonraki adımlar:**
 1. **Kanal yönü: CIA/truth/mystery'e dön** (analytics-destekli). Piller: declassified sırlar, çözülmemiş gizemler/kayıplar, UFO/UAP (kanal adı `The Truth Is Out There`), devlet örtbasları. Somut ilk video seçilecek.
-2. Teaser YouTube sürümü: trailer ses-tasarımıyla mı yoksa Pixabay/Ses-kitaplığı track mi — kullanıcı seçecek.
-3. `a4dbd8b` push bekliyor.
+2. Teaser'lar TikTok/IG (silent + in-app ses) + YouTube (trailer sesli) yayınlanacak — maç 15 Tem, aynı gün çıkmalı.
+3. `a4dbd8b` + `01ae7b1` push bekliyor.
 
 ---
 

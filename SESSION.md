@@ -1,7 +1,7 @@
 # Pipeline Session Log
 
 > **Read this file first at the start of each session.** This is the conversation history backup.
-> Links: `CHANGELOG.md` (what changed) · `CLAUDE.md` (rules)
+> Links: `CLAUDE.md` (kurallar) · `WORKFLOW.md` (nasil calisir) · `../Key Decisions.md` (neden) · `SESSION_ARCHIVE.md` (eski oturumlar) · git log (ne degisti)
 
 ---
 

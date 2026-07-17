@@ -1,5 +1,16 @@
 # Kültürel AI Agent Pipeline — Claude Rules
 
+## Coding Discipline (Karpathy Guidelines)
+
+> Kaynak: `multica-ai/andrej-karpathy-skills` (CLAUDE.md). LLM kod hatalarını azaltan davranış kuralları. Bias: hız yerine dikkat; trivial işlerde muhakeme kullan.
+
+1. **Kodlamadan önce düşün.** Varsayımlarını açıkça söyle; emin değilsen SOR. Birden çok yorum varsa hepsini sun, sessizce seçme. Daha basit yol varsa söyle. Belirsizlik varsa DUR, neyin karışık olduğunu adlandır.
+2. **Önce sadelik.** Problemi çözen minimum kod. İstenmeyen özellik/soyutlama/"esneklik"/imkânsız-senaryo error handling yok. 200 satır 50 olabiliyorsa yeniden yaz. Test: "Kıdemli bir mühendis bunu fazla karmaşık bulur mu?"
+3. **Cerrahi değişiklik.** Sadece gerekeni değiştir. Bitişik kodu/yorumu/formatı "iyileştirme", bozuk olmayanı refactor etme, mevcut stile uy. Alakasız ölü kodu SİLME — sadece belirt. Kendi değişikliğinin yarattığı orphan import/değişkeni temizle. Test: her değişen satır doğrudan isteğe izlenebilmeli.
+4. **Hedef-odaklı yürütme.** Görevi doğrulanabilir hedefe çevir ("validation ekle" → "geçersiz girdi için test yaz, geçir"). Çok adımlı işte kısa plan ver (adım → doğrulama). Güçlü başarı kriteri bağımsız çalışmayı sağlar; "çalışsın yeter" sürekli soru gerektirir.
+
+**Çalışıyor sinyali:** diff'te daha az gereksiz değişiklik, aşırı-karmaşıklıktan daha az yeniden-yazım, sorular hatadan SONRA değil ÖNCE geliyor.
+
 ## Architecture
 - `state.json`: single source of truth for pipeline state
 - `ffmpeg_builder`: only module allowed to call subprocess

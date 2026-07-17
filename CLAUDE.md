@@ -33,6 +33,9 @@
 python pipeline.py <youtube_url> [--mode adaptive_mode] [--trace-arbiter] [--no-captions]
 ```
 
+## FFmpeg Render Presets
+- Test render: `-preset ultrafast -crf 28` (5x hizli) · Final: `-preset slow -crf 18` (en iyi kalite)
+
 ## Multi-Part Video Workflow (Altın Kural)
 
 1. **Step 1:** Ilk parcayi pipeline'dan gecir, cikar

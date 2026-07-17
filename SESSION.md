@@ -5,6 +5,34 @@
 
 ---
 
+## GÜNCEL DURUM — 2026-07-17 (Karpathy kuralları + skill kurulumları + workflow review + doküman konsolidasyonu)
+
+**1) KURAL: Karpathy coding discipline `CLAUDE.md`'ye eklendi** (Karar 34, commit `42a359d`). 4 prensip: önce düşün / önce sadelik / cerrahi değişiklik / hedef-odaklı yürütme. Kaynak: `multica-ai/andrej-karpathy-skills`.
+
+**2) SKILL KURULUMLARI (`~/.claude/skills/`):**
+- **`watch`** (bradautomates/claude-video) — video izle/analiz (hook araştırması için). ⚠️ Çalışması için `yt-dlp` + `ffprobe` sistem PATH'e eklenmeli (bizde yt-dlp sadece Python modülü, ffmpeg imageio-gömülü/ffprobe'suz). Whisper fallback için `~/.config/watch/.env`'e Groq anahtarı (opsiyonel). Hook kurulmadı (gerekmez).
+- **`canvas-design`**, **`algorithmic-art`**, **`brand-guidelines`** (anthropics/skills) — görsel/thumbnail üretimi. NOT: brand-guidelines Anthropic'in KENDİ markası; kanal markası için sadece şablon.
+- **`kulturel-video`** (kendi skill'imiz) — üretim çeklisti: lane seçimi (CIA/truth), hook/retention, telif, 12/18 slot. Kuralları TEKRAR ETMEZ, kanonik dosyalara işaret eder.
+- Karar 36: **moviepy pipeline'a GİRMEZ** (ffmpeg_builder/PTS kuralını baypas eder); montaj otomasyonu mevcut mimaride yapılacak.
+
+**3) WORKFLOW REVIEW (kod + doküman) — bulgular:**
+- **Ölü kod:** `artifact_auditor.py` (568 satır) hiçbir yerden çağrılmıyor. Yönetişim katmanı (~2.800 satır: arbiter/AOR/memory_influence/steptracker) sadece legacy klip yolunda; news yolu neredeyse hiçbirini kullanmıyor. **Karar bekliyor: arşivlensin mi?** (Karar 37 — kod temizliği ayrı oturuma.)
+- Benzer projeler: MoneyPrinterTurbo (~90k★), ShortGPT, AI-Youtube-Shorts-Generator. Bizim farkımız/değerimiz: öğrenme döngüsü + telif korkuluğu + editoryal trend guard + yayın-slot disiplini. Jenerik video-fabrikası kısmında onlar önde; strateji katmanında biz.
+- llm-council gibi ek repo GEREKMEZ.
+
+**4) DOKÜMAN KONSOLİDASYONU (Karar 35, commit'ler `e31e49d`..`212a8a8`):**
+- 9 bayat dosya → `_archive/docs/` (gerekçe tablosu orada): `_CLAUDE.md`, `MEMORY/*`, `STATE_CONTRACT`, `REFACTOR_SEQUENCE`, `ROADMAP`, `CHANGELOG`, `memory_architecture_proposal`. `.Rhistory` silindi. `preferences.md` → CLAUDE.md'ye gömüldü.
+- **SESSION.md diyeti: 793→82 satır** (eski oturumlar `SESSION_ARCHIVE.md`). Kural: son 2-3 oturum burada kalır.
+- **README güncellendi** (bir pivot gerideydi — hâlâ "futbol haberi" diyordu; şimdi CIA/truth yönü + köprü kuralı). Hub 1-ekran vitrine indi. `kulturel-ai-agent` skill'inin session-sonu kuralı "5 dosyayı güncelle" → **"sadece değişeni güncelle"** (tek-kaynak).
+
+**Açık / sonraki adımlar:**
+1. **İlk CIA/truth videosu** (somut konu seçilecek) — içerik > kod.
+2. Kod temizliği kararı: legacy klip-pipeline + yönetişim katmanı arşivlensin mi? (Karar 37)
+3. `watch` skill bağımlılıkları (yt-dlp + ffprobe PATH) — kullanıcı onayı bekliyor.
+4. (07-14'ten devir) `a4dbd8b` + `01ae7b1` push bekliyor + bugünün 6 doc commit'i.
+
+---
+
 ## GÜNCEL DURUM — 2026-07-14 (Analytics API teşhis katmanı + İngiltere-Arjantin teaser + çapraz-paylaşım telif dersleri)
 
 **1) YENİ ÖZELLİK: Analytics API teşhis katmanı (commit `a4dbd8b`, push bekliyor).**

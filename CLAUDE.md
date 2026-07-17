@@ -36,6 +36,11 @@ python pipeline.py <youtube_url> [--mode adaptive_mode] [--trace-arbiter] [--no-
 ## FFmpeg Render Presets
 - Test render: `-preset ultrafast -crf 28` (5x hizli) · Final: `-preset slow -crf 18` (en iyi kalite)
 
+## Disk Hijyeni (temizlik kurali)
+- Upload dogrulandiktan sonra batch klasorunden `final*.mp4` HARIC her sey silinebilir (kaynak/klip/ara-render yeniden uretilebilir).
+- `temp/` serbestce bosaltilir — AKTIF kampanya varliklari haric (or. yaklasan mac icin teaser/AI klipler; olay gecince onlar da gider).
+- `performance_store.json` + `weights/` ASLA silinmez (ogrenme dongusunun canli verisi). `logs/` kucuk kalir, dokunma.
+
 ## Multi-Part Video Workflow (Altın Kural)
 
 1. **Step 1:** Ilk parcayi pipeline'dan gecir, cikar

@@ -25,11 +25,13 @@
 - **SESSION.md diyeti: 793→82 satır** (eski oturumlar `SESSION_ARCHIVE.md`). Kural: son 2-3 oturum burada kalır.
 - **README güncellendi** (bir pivot gerideydi — hâlâ "futbol haberi" diyordu; şimdi CIA/truth yönü + köprü kuralı). Hub 1-ekran vitrine indi. `kulturel-ai-agent` skill'inin session-sonu kuralı "5 dosyayı güncelle" → **"sadece değişeni güncelle"** (tek-kaynak).
 
+**5) ÖLÜ KOD ARŞİVİ (güvenli üçlü):** `artifact_auditor.py` (568, sıfır import) + `obsidian_bridge/` (kullanıcı kararı: workflow Obsidian entegrasyonu gerektirecek kadar karmaşık değil) → `_archive/code/`. `effects.py` zaten diskte yokmuş (hayalet referanstı). Arşiv sonrası **19/19 suite, 283/283 PASS.**
+
 **Açık / sonraki adımlar:**
 1. **İlk CIA/truth videosu** (somut konu seçilecek) — içerik > kod.
-2. Kod temizliği kararı: legacy klip-pipeline + yönetişim katmanı arşivlensin mi? (Karar 37)
+2. Kod temizliği KALAN kısım: legacy klip-pipeline + yönetişim katmanı (~2.800 satır, kablolu — ameliyat ister) arşivlensin mi? (Karar 37)
 3. `watch` skill bağımlılıkları (yt-dlp + ffprobe PATH) — kullanıcı onayı bekliyor.
-4. (07-14'ten devir) `a4dbd8b` + `01ae7b1` push bekliyor + bugünün 6 doc commit'i.
+4. ~~Push~~ ✅ tümü push'landı (`8cd7335` + ölü-kod arşivi).
 
 ---
 
